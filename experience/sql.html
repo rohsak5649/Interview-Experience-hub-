@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Top 100 DBMS & SQL Questions</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    body {
+      background-color: #000;
+      color: #f0f0f0;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      color: #00e0ff;
+      margin-bottom: 2rem;
+    }
+
+    .question-list {
+      background-color: #1a1a1a;
+      border: 1px solid #00e0ff50;
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 0 auto;
+      max-width: 900px;
+      box-shadow: 0 0 10px rgba(0, 224, 255, 0.1);
+    }
+
+    .question-list ol {
+      padding-left: 1rem;
+      line-height: 1.6;
+      font-size: 1rem;
+      column-count: 2;
+      column-gap: 3rem;
+    }
+
+    .question-list li {
+      margin-bottom: 0.5rem;
+    }
+
+    .back-btn {
+      display: block;
+      margin: 2rem auto 0;
+      width: fit-content;
+      padding: 0.8rem 1.5rem;
+      background-color: #00e0ff;
+      color: #000;
+      font-weight: bold;
+      text-decoration: none;
+      border-radius: 8px;
+    }
+
+    .back-btn:hover {
+      background-color: #00bcd4;
+    }
+
+    @media (max-width: 768px) {
+      .question-list ol {
+        column-count: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📘 Top 100 DBMS & SQL Interview Questions</h1>
+
+  <div class="question-list">
+    <ol>
+      <li>What is DBMS?</li>
+      <li>Difference between DBMS and RDBMS</li>
+      <li>What is SQL?</li>
+      <li>Types of SQL commands</li>
+      <li>What is a primary key?</li>
+      <li>What is a foreign key?</li>
+      <li>What is normalization?</li>
+      <li>Types of normalization</li>
+      <li>What is denormalization?</li>
+      <li>What is a candidate key?</li>
+      <li>What is a unique key?</li>
+      <li>What is a composite key?</li>
+      <li>What is an index in SQL?</li>
+      <li>What is a view in SQL?</li>
+      <li>Difference between WHERE and HAVING</li>
+      <li>Difference between DELETE, TRUNCATE, and DROP</li>
+      <li>What is a join? Types of joins</li>
+      <li>What is a self join?</li>
+      <li>What is a cross join?</li>
+      <li>Difference between inner and outer join</li>
+      <li>What is a subquery?</li>
+      <li>What is a correlated subquery?</li>
+      <li>What is a stored procedure?</li>
+      <li>What is a trigger?</li>
+      <li>What is a transaction?</li>
+      <li>ACID properties in DBMS</li>
+      <li>What is a cursor?</li>
+      <li>What is a schema?</li>
+      <li>What is a relationship?</li>
+      <li>Types of relationships in DBMS</li>
+      <li>What is an ER model?</li>
+      <li>What is an entity and attribute?</li>
+      <li>Difference between clustered and non-clustered index</li>
+      <li>What is a surrogate key?</li>
+      <li>What is data redundancy?</li>
+      <li>What is data integrity?</li>
+      <li>What is the difference between DBMS and file system?</li>
+      <li>What is DDL, DML, DCL, TCL?</li>
+      <li>What is the use of GROUP BY clause?</li>
+      <li>What is the difference between UNION and UNION ALL?</li>
+      <li>What is a NULL value?</li>
+      <li>How to handle NULL in SQL?</li>
+      <li>What is the BETWEEN operator?</li>
+      <li>What is the LIKE operator?</li>
+      <li>What is IN operator?</li>
+      <li>What is EXISTS in SQL?</li>
+      <li>What is a materialized view?</li>
+      <li>What is indexing? Types of indexes</li>
+      <li>Difference between OLAP and OLTP</li>
+      <li>What is data warehousing?</li>
+      <li>What is a checkpoint in DBMS?</li>
+      <li>What is a deadlock in DBMS?</li>
+      <li>How to resolve deadlocks?</li>
+      <li>What is locking in DBMS?</li>
+      <li>What is a 2-phase commit?</li>
+      <li>What is log-based recovery?</li>
+      <li>What is shadow paging?</li>
+      <li>What are aggregate functions in SQL?</li>
+      <li>What is a constraint? Types of constraints</li>
+      <li>Difference between CHAR and VARCHAR</li>
+      <li>What is a sequence?</li>
+      <li>What is a synonym?</li>
+      <li>Explain normalization forms up to 3NF</li>
+      <li>What is BCNF?</li>
+      <li>Explain a real-time database example</li>
+      <li>How do you optimize SQL queries?</li>
+      <li>What is a Cartesian product?</li>
+      <li>What is indexing strategy?</li>
+      <li>What is data independence?</li>
+      <li>What is the difference between logical and physical data independence?</li>
+      <li>Explain SELECT statement syntax</li>
+      <li>How to perform JOIN using WHERE?</li>
+      <li>How to find duplicates in a table?</li>
+      <li>How to remove duplicates from a table?</li>
+      <li>Explain window functions in SQL</li>
+      <li>What is ROW_NUMBER() in SQL?</li>
+      <li>Difference between RANK() and DENSE_RANK()</li>
+      <li>What is PARTITION BY in SQL?</li>
+      <li>Explain CASE WHEN in SQL</li>
+      <li>What are scalar functions in SQL?</li>
+      <li>Explain DATE functions in SQL</li>
+      <li>What is COALESCE() in SQL?</li>
+      <li>What is NVL(), ISNULL(), IFNULL()</li>
+      <li>What is the difference between COUNT(*) and COUNT(column)?</li>
+      <li>How to update data using SQL?</li>
+      <li>What is the difference between UPDATE and MERGE?</li>
+      <li>Explain MERGE statement</li>
+      <li>How to backup and restore databases?</li>
+      <li>What is a temp table?</li>
+      <li>Difference between temp table and table variable</li>
+      <li>What is a pivot table in SQL?</li>
+      <li>What is the difference between SQL and MySQL?</li>
+      <li>How to connect MySQL with a programming language?</li>
+      <li>Write SQL query to get second highest salary</li>
+      <li>Write SQL query to find duplicate rows</li>
+      <li>Write query to display nth highest salary</li>
+      <li>What is the difference between SQL Server, Oracle, MySQL?</li>
+      <li>Explain transactions with example in SQL</li>
+      <li>What is the use of LIMIT in MySQL?</li>
+      <li>How to export and import databases in MySQL?</li>
+      <li>How to change column datatype in MySQL?</li>
+    </ol>
+  </div>
+
+  <a href="../index.html" class="back-btn">⬅ Back to Home</a>
+</body>
+</html>
