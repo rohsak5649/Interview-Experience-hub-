@@ -1,345 +1,3564 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Interview Experience Hub</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <title>Interview Experience Hub — Rohan Sakhare</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --glass-bg: rgba(255,255,255,0.055);
+      --glass-border: rgba(255,255,255,0.11);
+      --accent-cyan: #00dcff;
+      --accent-purple: #8c64ff;
+      --accent-pink: #ff50c8;
+      --text-primary: rgba(255,255,255,0.95);
+      --text-secondary: rgba(255,255,255,0.55);
+      --text-tertiary: rgba(255,255,255,0.28);
+      --bg-deep: #04050d;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Sora',sans-serif;background:var(--bg-deep);color:var(--text-primary);min-height:100vh;overflow-x:hidden;cursor:none}
+
+    /* CURSOR */
+    #cursor{position:fixed;width:10px;height:10px;background:var(--accent-cyan);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .12s,background .3s;mix-blend-mode:screen}
+    #cursor-trail{position:fixed;width:38px;height:38px;border:1px solid rgba(0,220,255,0.3);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s cubic-bezier(.16,1,.3,1)}
+
+    /* BG */
+    #bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+    .orb{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;animation:orbFloat 22s ease-in-out infinite}
+    .orb-1{width:700px;height:700px;background:radial-gradient(circle,rgba(0,180,255,.1),transparent 70%);top:-250px;left:-200px;animation-delay:0s}
+    .orb-2{width:600px;height:600px;background:radial-gradient(circle,rgba(140,100,255,.09),transparent 70%);bottom:-150px;right:-150px;animation-delay:-8s}
+    .orb-3{width:500px;height:500px;background:radial-gradient(circle,rgba(255,80,200,.07),transparent 70%);top:40%;left:35%;animation-delay:-16s}
+    @keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(60px,-50px) scale(1.04)}66%{transform:translate(-40px,70px) scale(.96)}}
+
+    .grid-overlay{position:fixed;inset:0;background-image:linear-gradient(rgba(0,220,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(0,220,255,.022) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0}
+    .scanline{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent-cyan),transparent);opacity:.25;z-index:1;animation:scanDown 10s linear infinite}
+    @keyframes scanDown{0%{top:0;opacity:.35}100%{top:100%;opacity:0}}
+
+    .particles-container{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+    .particle{position:absolute;width:2px;height:2px;border-radius:50%;opacity:0;animation:particleFloat linear infinite}
+    @keyframes particleFloat{0%{transform:translateY(100vh);opacity:0}10%{opacity:.6}90%{opacity:.2}100%{transform:translateY(-30px) translateX(80px);opacity:0}}
+
+    /* CONTENT */
+    .content-wrap{position:relative;z-index:1}
+
+    /* NAV */
+    nav{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;gap:2px;background:rgba(8,10,22,.72);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);border:1px solid var(--glass-border);border-radius:100px;padding:7px 10px;box-shadow:0 8px 40px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.07)}
+    .nav-logo{font-size:.82rem;font-weight:800;color:var(--accent-cyan);padding:7px 18px;letter-spacing:.02em;margin-right:6px}
+    nav a{text-decoration:none;color:var(--text-secondary);font-size:.76rem;font-weight:500;padding:7px 16px;border-radius:100px;transition:all .3s cubic-bezier(.16,1,.3,1);letter-spacing:.04em;cursor:pointer}
+    nav a:hover{color:var(--text-primary);background:rgba(255,255,255,.08)}
+    nav a.active{color:var(--accent-cyan);background:rgba(0,220,255,.1)}
+
+    /* HERO */
+    .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 2rem 6rem;position:relative}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,220,255,.08);border:1px solid rgba(0,220,255,.2);border-radius:100px;padding:6px 16px;font-size:.72rem;font-weight:600;color:var(--accent-cyan);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2rem;animation:fadeUp .8s cubic-bezier(.16,1,.3,1) forwards;opacity:0}
+    .hero-badge::before{content:'';width:6px;height:6px;background:var(--accent-cyan);border-radius:50%;animation:blink 2s ease-in-out infinite}
+    @keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.6)}}
+    .hero-name{font-size:clamp(3.2rem,9vw,7.5rem);font-weight:800;line-height:1;letter-spacing:-.03em;background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,.55) 50%,var(--accent-cyan) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.5rem;animation:fadeUp .9s .2s cubic-bezier(.16,1,.3,1) forwards;opacity:0}
+    .hero-sub{font-size:clamp(1rem,2.5vw,1.35rem);font-weight:300;color:var(--text-secondary);margin-bottom:.8rem;animation:fadeUp .9s .35s cubic-bezier(.16,1,.3,1) forwards;opacity:0}
+    .hero-typed{font-family:'JetBrains Mono',monospace;font-size:clamp(.82rem,2vw,1.05rem);color:var(--accent-cyan);margin-bottom:2.5rem;min-height:1.5em;animation:fadeUp .9s .5s cubic-bezier(.16,1,.3,1) forwards;opacity:0}
+    .hero-stats{display:flex;gap:1.5rem;margin-bottom:2.8rem;animation:fadeUp .9s .6s cubic-bezier(.16,1,.3,1) forwards;opacity:0;flex-wrap:wrap;justify-content:center}
+    .stat-item{text-align:center;padding:.9rem 1.4rem;background:var(--glass-bg);backdrop-filter:blur(30px);border:1px solid var(--glass-border);border-radius:16px}
+    .stat-num{font-size:1.9rem;font-weight:700;color:var(--accent-cyan);line-height:1}
+    .stat-label{font-size:.67rem;color:var(--text-secondary);margin-top:4px;letter-spacing:.06em;text-transform:uppercase}
+    .hero-cta{display:flex;gap:1rem;animation:fadeUp .9s .7s cubic-bezier(.16,1,.3,1) forwards;opacity:0;flex-wrap:wrap;justify-content:center}
+    .btn-primary{padding:13px 30px;border-radius:100px;background:linear-gradient(135deg,var(--accent-cyan),var(--accent-purple));border:none;color:#fff;font-size:.88rem;font-weight:600;cursor:pointer;transition:all .3s cubic-bezier(.16,1,.3,1);box-shadow:0 0 28px rgba(0,220,255,.28);letter-spacing:.02em;font-family:'Sora',sans-serif}
+    .btn-primary:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 0 50px rgba(0,220,255,.5)}
+    .btn-ghost{padding:13px 30px;border-radius:100px;background:var(--glass-bg);border:1px solid var(--glass-border);color:var(--text-primary);font-size:.88rem;font-weight:500;cursor:pointer;transition:all .3s cubic-bezier(.16,1,.3,1);backdrop-filter:blur(20px);letter-spacing:.02em;font-family:'Sora',sans-serif}
+    .btn-ghost:hover{background:rgba(255,255,255,.1);transform:translateY(-2px)}
+    .scroll-hint{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text-tertiary);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;animation:fadeUp .9s 1.2s cubic-bezier(.16,1,.3,1) forwards,scrollBob 2s 2.2s ease-in-out infinite;opacity:0}
+    .scroll-hint::after{content:'';width:1px;height:36px;background:linear-gradient(to bottom,var(--accent-cyan),transparent)}
+    @keyframes scrollBob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+
+    /* SECTIONS */
+    .section{padding:5.5rem 2rem;position:relative}
+    .section-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,220,255,.13),transparent)}
+    .section-header{text-align:center;margin-bottom:3rem}
+    .section-tag{display:inline-flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--accent-cyan);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.9rem;opacity:.8}
+    .section-tag::before,.section-tag::after{content:'';width:28px;height:1px;background:linear-gradient(90deg,transparent,var(--accent-cyan))}
+    .section-tag::after{background:linear-gradient(90deg,var(--accent-cyan),transparent)}
+    .section-title{font-size:clamp(1.7rem,4vw,2.8rem);font-weight:700;letter-spacing:-.02em;background:linear-gradient(135deg,#fff 40%,rgba(255,255,255,.45));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .chip-row{display:flex;justify-content:center;gap:.5rem;margin-top:.8rem;flex-wrap:wrap}
+    .chip{font-size:.63rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:4px 11px;border-radius:100px}
+    .chip-cyan{background:rgba(0,220,255,.1);color:var(--accent-cyan);border:1px solid rgba(0,220,255,.2)}
+    .chip-purple{background:rgba(140,100,255,.1);color:var(--accent-purple);border:1px solid rgba(140,100,255,.2)}
+    .chip-pink{background:rgba(255,80,200,.1);color:var(--accent-pink);border:1px solid rgba(255,80,200,.2)}
+
+    /* SCROLL TRACK */
+    .scroll-track-wrapper{position:relative;overflow:hidden}
+    .scroll-track-wrapper::before,.scroll-track-wrapper::after{content:'';position:absolute;top:0;bottom:0;width:70px;z-index:10;pointer-events:none}
+    .scroll-track-wrapper::before{left:0;background:linear-gradient(90deg,var(--bg-deep),transparent)}
+    .scroll-track-wrapper::after{right:0;background:linear-gradient(270deg,var(--bg-deep),transparent)}
+    .scroll-track{display:flex;gap:1.2rem;overflow-x:auto;overflow-y:visible;padding:1.5rem 60px 2rem;scroll-snap-type:x mandatory;scrollbar-width:none}
+    .scroll-track::-webkit-scrollbar{display:none}
+    .scroll-nav{display:flex;justify-content:center;gap:10px;margin-top:1.2rem}
+    .scroll-btn{width:42px;height:42px;border-radius:50%;background:var(--glass-bg);border:1px solid var(--glass-border);color:var(--text-primary);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;backdrop-filter:blur(20px);font-family:'Sora',sans-serif}
+    .scroll-btn:hover{background:rgba(0,220,255,.1);border-color:rgba(0,220,255,.4);transform:scale(1.1)}
+
+    /* COMPANY CARDS */
+    .company-card{flex:0 0 auto;width:155px;scroll-snap-align:start;cursor:pointer}
+    .company-card-inner{background:rgba(255,255,255,.042);backdrop-filter:blur(40px) saturate(200%);-webkit-backdrop-filter:blur(40px) saturate(200%);border:1px solid rgba(255,255,255,.09);border-radius:22px;padding:1.3rem .9rem;text-align:center;transition:all .4s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;box-shadow:0 4px 28px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.07)}
+    .company-card-inner::before{content:'';position:absolute;inset:0;border-radius:22px;background:radial-gradient(ellipse at 50% 0%,rgba(0,220,255,.08),transparent 60%);opacity:0;transition:opacity .4s}
+    .company-card:hover .company-card-inner{transform:translateY(-8px) scale(1.02);border-color:rgba(0,220,255,.28);box-shadow:0 20px 55px rgba(0,0,0,.4),0 0 28px rgba(0,220,255,.14),inset 0 1px 0 rgba(255,255,255,.13)}
+    .company-card:hover .company-card-inner::before{opacity:1}
+    .company-card-inner img{width:68px;height:68px;object-fit:contain;margin-bottom:.75rem;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4));transition:transform .4s cubic-bezier(.16,1,.3,1)}
+    .company-card:hover .company-card-inner img{transform:scale(1.08) translateY(-2px)}
+    .company-card-inner .card-name{font-size:.76rem;font-weight:600;color:var(--text-primary);line-height:1.3}
+
+    /* FRIEND CARDS */
+    .friend-card{flex:0 0 auto;width:150px;scroll-snap-align:start;cursor:pointer}
+    .friend-card-inner{background:rgba(140,100,255,.04);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border:1px solid rgba(140,100,255,.1);border-radius:22px;padding:1.3rem .9rem;text-align:center;transition:all .4s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;box-shadow:0 4px 28px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.06)}
+    .friend-card-inner::before{content:'';position:absolute;inset:0;border-radius:22px;background:radial-gradient(ellipse at 50% 0%,rgba(140,100,255,.09),transparent 60%);opacity:0;transition:opacity .4s}
+    .friend-card:hover .friend-card-inner{transform:translateY(-8px) scale(1.02);border-color:rgba(140,100,255,.32);box-shadow:0 20px 55px rgba(0,0,0,.4),0 0 28px rgba(140,100,255,.17),inset 0 1px 0 rgba(255,255,255,.11)}
+    .friend-card:hover .friend-card-inner::before{opacity:1}
+    .friend-avatar{width:68px;height:68px;border-radius:50%;object-fit:cover;margin-bottom:.75rem;border:2px solid rgba(140,100,255,.28);transition:all .4s cubic-bezier(.16,1,.3,1);filter:drop-shadow(0 4px 10px rgba(0,0,0,.5))}
+    .friend-card:hover .friend-avatar{border-color:rgba(140,100,255,.7);transform:scale(1.08);box-shadow:0 0 18px rgba(140,100,255,.3)}
+    .friend-card-inner .card-name{font-size:.75rem;font-weight:600;color:var(--text-primary);line-height:1.3;margin-bottom:3px}
+    .friend-card-inner .card-company{font-size:.65rem;color:var(--accent-purple);opacity:.9}
+
+    /* TOPIC CARDS */
+    .topic-card{flex:0 0 auto;width:150px;scroll-snap-align:start;cursor:pointer}
+    .topic-card-inner{background:rgba(255,80,200,.04);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border:1px solid rgba(255,80,200,.1);border-radius:22px;padding:1.3rem .9rem;text-align:center;transition:all .4s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;box-shadow:0 4px 28px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.05)}
+    .topic-card-inner::before{content:'';position:absolute;inset:0;border-radius:22px;background:radial-gradient(ellipse at 50% 0%,rgba(255,80,200,.1),transparent 60%);opacity:0;transition:opacity .4s}
+    .topic-card:hover .topic-card-inner{transform:translateY(-8px) scale(1.02);border-color:rgba(255,80,200,.38);box-shadow:0 20px 55px rgba(0,0,0,.4),0 0 28px rgba(255,80,200,.2),inset 0 1px 0 rgba(255,255,255,.11)}
+    .topic-card:hover .topic-card-inner::before{opacity:1}
+    .topic-card-inner img{width:68px;height:68px;object-fit:contain;margin-bottom:.75rem;transition:transform .4s cubic-bezier(.16,1,.3,1);filter:drop-shadow(0 4px 10px rgba(0,0,0,.4))}
+    .topic-card:hover .topic-card-inner img{transform:scale(1.1) rotate(-4deg)}
+    .topic-card-inner .card-name{font-size:.75rem;font-weight:600;color:var(--text-primary);line-height:1.3;margin-bottom:3px}
+    .topic-card-inner .card-sub{font-size:.63rem;color:var(--accent-pink);opacity:.85}
+
+    /* REVEAL */
+    .reveal{opacity:0;transform:translateY(36px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+
+    /* ── EXPERIENCE MODAL / DETAIL VIEW ── */
+    #exp-overlay{position:fixed;inset:0;z-index:500;display:none;align-items:flex-start;justify-content:center;padding:2rem 1rem 2rem;overflow-y:auto;background:rgba(4,5,13,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);animation:overlayIn .35s cubic-bezier(.16,1,.3,1)}
+    #exp-overlay.open{display:flex}
+    @keyframes overlayIn{from{opacity:0}to{opacity:1}}
+
+    #exp-panel{width:100%;max-width:820px;background:rgba(10,12,28,.9);border:1px solid rgba(255,255,255,.1);border-radius:28px;padding:2.5rem 2.5rem 3rem;position:relative;box-shadow:0 30px 100px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.07);animation:panelIn .4s cubic-bezier(.16,1,.3,1);margin:auto}
+    @keyframes panelIn{from{opacity:0;transform:translateY(40px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+    .exp-close{position:sticky;top:0;float:right;margin-bottom:1rem;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:var(--text-primary);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .25s;z-index:10;font-family:'Sora',sans-serif}
+    .exp-close:hover{background:rgba(255,80,80,.2);border-color:rgba(255,80,80,.4);transform:scale(1.1)}
+
+    /* Styles for injected experience HTML */
+    #exp-panel header{background:transparent !important;padding:0 0 1.5rem;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:1.5rem;text-align:left}
+    #exp-panel header h1{font-size:clamp(1.2rem,3vw,1.8rem);font-weight:700;background:linear-gradient(135deg,#fff,rgba(0,220,255,.9));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.3;margin-bottom:.5rem}
+    #exp-panel header p{font-size:.82rem;color:var(--text-secondary)}
+    #exp-panel main, #exp-panel .experience-container, #exp-panel > div:not(.exp-close){line-height:1.8}
+    #exp-panel h1,#exp-panel h2{font-size:1.15rem;font-weight:700;color:var(--accent-cyan);margin:1.5rem 0 .6rem;letter-spacing:-.01em}
+    #exp-panel h1:first-child{margin-top:0}
+    #exp-panel h3{font-size:1rem;font-weight:600;color:rgba(255,255,255,.85);margin:1.2rem 0 .4rem}
+    #exp-panel p{font-size:.88rem;color:var(--text-secondary);margin-bottom:.8rem;line-height:1.8}
+    #exp-panel ul,#exp-panel ol{padding-left:1.4rem;margin-bottom:.8rem}
+    #exp-panel li{font-size:.86rem;color:var(--text-secondary);margin-bottom:.3rem;line-height:1.7}
+    #exp-panel strong{color:var(--text-primary);font-weight:600}
+    #exp-panel em{color:var(--accent-cyan);font-style:italic}
+    #exp-panel code{font-family:'JetBrains Mono',monospace;font-size:.8rem;background:rgba(0,220,255,.08);border:1px solid rgba(0,220,255,.15);border-radius:6px;padding:1px 6px;color:var(--accent-cyan)}
+    #exp-panel .problem-list,.exp-panel .section{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem}
+    #exp-panel .category{font-size:.8rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-pink);margin-bottom:.6rem}
+    #exp-panel .back-button,
+#exp-panel .back-btn {
+  display: none;
+}
+    #exp-panel a{color:var(--accent-cyan);text-decoration:none}
+    #exp-panel a:hover{text-decoration:underline}
+    #exp-panel table{width:100%;border-collapse:collapse;font-size:.82rem;margin:1rem 0}
+    #exp-panel th{background:rgba(0,220,255,.1);color:var(--accent-cyan);padding:.6rem .8rem;text-align:left;font-weight:600;border-bottom:1px solid rgba(0,220,255,.2)}
+    #exp-panel td{padding:.5rem .8rem;border-bottom:1px solid rgba(255,255,255,.05);color:var(--text-secondary)}
+
+    /* FOOTER */
+    footer{padding:4rem 2rem;text-align:center;position:relative;z-index:1}
+    .footer-logo{font-size:1.4rem;font-weight:800;background:linear-gradient(135deg,var(--accent-cyan),var(--accent-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.8rem}
+    .footer-text{font-size:.76rem;color:var(--text-tertiary);line-height:1.9;margin-bottom:1.8rem}
+    .footer-line{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent);margin-bottom:1.5rem}
+    .footer-copy{font-size:.68rem;color:var(--text-tertiary);letter-spacing:.05em}
+
+    @media(max-width:640px){nav{display:none}.hero{padding-top:80px}.section{padding:4rem 1rem}#exp-panel{padding:1.5rem 1.2rem 2rem;border-radius:20px}}
+
+    body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");pointer-events:none;z-index:999;opacity:.35}
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Rohan Sakhare</h1>
-    <p>Computer Engineer DIT_2025 | Interview Experience Hub</p>
+
+<div id="cursor"></div>
+<div id="cursor-trail"></div>
+<div class="scanline"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+<div class="grid-overlay"></div>
+<div class="particles-container" id="particles"></div>
+
+<!-- EXPERIENCE OVERLAY -->
+<div id="exp-overlay" role="dialog" aria-modal="true">
+  <div id="exp-panel">
+    <button class="exp-close" onclick="closeExp()" aria-label="Close">✕</button>
+    <div id="exp-content"></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-logo">RS ✦</span>
+  <a href="#my-exp" class="active">My Exp</a>
+  <a href="#friends">Friends</a>
+  <a href="#topics">Topics</a>
+</nav>
+
+<div class="content-wrap">
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-badge">DIT Batch 2025 · Computer Engineer</div>
+  <h1 class="hero-name">Rohan Sakhare</h1>
+  <p class="hero-sub">Interview Experience Hub</p>
+  <p class="hero-typed" id="typed-text"></p>
+  <div class="hero-stats">
+    <div class="stat-item"><div class="stat-num" data-count="20">0</div><div class="stat-label">My Experiences</div></div>
+    <div class="stat-item"><div class="stat-num" data-count="33">0</div><div class="stat-label">Friends' Stories</div></div>
+    <div class="stat-item"><div class="stat-num" data-count="11">0</div><div class="stat-label">DS&A Topics</div></div>
+    <div class="stat-item"><div class="stat-num" data-count="66">0</div><div class="stat-label">Total Pages</div></div>
+  </div>
+  <div class="hero-cta">
+    <button class="btn-primary" onclick="document.getElementById('my-exp').scrollIntoView({behavior:'smooth'})">Explore Experiences →</button>
+    <button class="btn-ghost" onclick="document.getElementById('topics').scrollIntoView({behavior:'smooth'})">Study Topics</button>
+  </div>
+  <div class="scroll-hint">Scroll to explore</div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- MY INTERVIEWS -->
+<section class="section" id="my-exp">
+  <div class="section-header reveal">
+    <div class="section-tag">01 · Personal Journey</div>
+    <h2 class="section-title">My Interview Experiences</h2>
+    <div class="chip-row"><span class="chip chip-cyan">20 Companies</span><span class="chip chip-cyan">Real Stories</span><span class="chip chip-cyan">Honest Reviews</span></div>
+  </div>
+  <div class="scroll-track-wrapper reveal">
+    <div class="scroll-track" id="company-track">
+      <div class="company-card" onclick="openExp('euronet')"><div class="company-card-inner"><img src="euronet.png" alt="Euronet"/><p class="card-name">Euronet</p></div></div>
+      <div class="company-card" onclick="openExp('jar')"><div class="company-card-inner"><img src="jar.png" alt="Jar"/><p class="card-name">Jar</p></div></div>
+      <div class="company-card" onclick="openExp('swiggy')"><div class="company-card-inner"><img src="swiggy.png" alt="Swiggy"/><p class="card-name">Swiggy</p></div></div>
+      <div class="company-card" onclick="openExp('frnd')"><div class="company-card-inner"><img src="frnd.png" alt="FRND"/><p class="card-name">FRND</p></div></div>
+      <div class="company-card" onclick="openExp('siemens')"><div class="company-card-inner"><img src="siemens.png" alt="Siemens"/><p class="card-name">Siemens</p></div></div>
+      <div class="company-card" onclick="openExp('mindsprint')"><div class="company-card-inner"><img src="mindsprint.png" alt="MindSprint"/><p class="card-name">MindSprint</p></div></div>
+      <div class="company-card" onclick="openExp('brainvire')"><div class="company-card-inner"><img src="brainvire.png" alt="Brainvire"/><p class="card-name">Brainvire</p></div></div>
+      <div class="company-card" onclick="openExp('namekart')"><div class="company-card-inner"><img src="namekart.png" alt="Namekart"/><p class="card-name">Namekart</p></div></div>
+      <div class="company-card" onclick="openExp('cognizant')"><div class="company-card-inner"><img src="cognizant.png" alt="Cognizant"/><p class="card-name">Cognizant</p></div></div>
+      <div class="company-card" onclick="openExp('xalta')"><div class="company-card-inner"><img src="xalta.png" alt="Xalta"/><p class="card-name">Xalta</p></div></div>
+      <div class="company-card" onclick="openExp('moschip')"><div class="company-card-inner"><img src="moschip.png" alt="Moschip"/><p class="card-name">Moschip</p></div></div>
+      <div class="company-card" onclick="openExp('accenture')"><div class="company-card-inner"><img src="accenture.png" alt="Accenture"/><p class="card-name">Accenture</p></div></div>
+      <div class="company-card" onclick="openExp('vistex')"><div class="company-card-inner"><img src="vistex.png" alt="Vistex"/><p class="card-name">Vistex</p></div></div>
+      <div class="company-card" onclick="openExp('6d')"><div class="company-card-inner"><img src="6d.png" alt="6D Technologies"/><p class="card-name">6D Technologies</p></div></div>
+      <div class="company-card" onclick="openExp('revature')"><div class="company-card-inner"><img src="revature.png" alt="Revature"/><p class="card-name">Revature</p></div></div>
+      <div class="company-card" onclick="openExp('microland')"><div class="company-card-inner"><img src="microland.png" alt="Microland"/><p class="card-name">Microland</p></div></div>
+      <div class="company-card" onclick="openExp('capsitech')"><div class="company-card-inner"><img src="capsitech.png" alt="Capsitech"/><p class="card-name">Capsitech</p></div></div>
+      <div class="company-card" onclick="openExp('portway')"><div class="company-card-inner"><img src="portway.png" alt="Portway International"/><p class="card-name">Portway Intl.</p></div></div>
+      <div class="company-card" onclick="openExp('avaali')"><div class="company-card-inner"><img src="avaali.png" alt="Avaali"/><p class="card-name">Avaali</p></div></div>
+      <div class="company-card" onclick="openExp('optimum')"><div class="company-card-inner"><img src="optimum.png" alt="Optimum Financial"/><p class="card-name">Optimum Financial</p></div></div>
+    </div>
+  </div>
+  <div class="scroll-nav"><button class="scroll-btn" onclick="scrollTrack('company-track',-1)">←</button><button class="scroll-btn" onclick="scrollTrack('company-track',1)">→</button></div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- FRIENDS -->
+<section class="section" id="friends">
+  <div class="section-header reveal">
+    <div class="section-tag">02 · Community</div>
+    <h2 class="section-title">My Friends' Experiences</h2>
+    <div class="chip-row"><span class="chip chip-purple">33 Engineers</span><span class="chip chip-purple">Top Companies</span><span class="chip chip-purple">Real Insights</span></div>
+  </div>
+  <div class="scroll-track-wrapper reveal">
+    <div class="scroll-track" id="friend-track">
+      <div class="friend-card" onclick="openExp('pumang')"><div class="friend-card-inner"><img class="friend-avatar" src="pumang.png" alt="Pumang"/><p class="card-name">Pumang Kirange</p><p class="card-company">@Capgemini · TraceLink</p></div></div>
+      <div class="friend-card" onclick="openExp('atharva')"><div class="friend-card-inner"><img class="friend-avatar" src="atharva.png" alt="Atharva"/><p class="card-name">Atharva Athanikar</p><p class="card-company">@Merkle</p></div></div>
+      <div class="friend-card" onclick="openExp('suraj')"><div class="friend-card-inner"><img class="friend-avatar" src="suraj.jpg" alt="Suraj"/><p class="card-name">Suraj Fartale</p><p class="card-company">@Goldman Sachs</p></div></div>
+      <div class="friend-card" onclick="openExp('suhelali')"><div class="friend-card-inner"><img class="friend-avatar" src="suhelali.png" alt="Suhelali"/><p class="card-name">Suhelali Pakjade</p><p class="card-company">@Juspay</p></div></div>
+      <div class="friend-card" onclick="openExp('omkar')"><div class="friend-card-inner"><img class="friend-avatar" src="omkar.png" alt="Omkar"/><p class="card-name">Omkar Nawale</p><p class="card-company">@HSBC</p></div></div>
+      <div class="friend-card" onclick="openExp('priyanka')"><div class="friend-card-inner"><img class="friend-avatar" src="priyanka.png" alt="Priyanka"/><p class="card-name">Priyanka Thakur</p><p class="card-company">@NICE</p></div></div>
+      <div class="friend-card" onclick="openExp('tushar')"><div class="friend-card-inner"><img class="friend-avatar" src="tushar.png" alt="Tushar"/><p class="card-name">Tushar Gosavi</p><p class="card-company">@Cognizant</p></div></div>
+      <div class="friend-card" onclick="openExp('devdatt')"><div class="friend-card-inner"><img class="friend-avatar" src="devdatt.png" alt="Devdatt"/><p class="card-name">Devdatt Khilare</p><p class="card-company">@MindSprint</p></div></div>
+      <div class="friend-card" onclick="openExp('gauri')"><div class="friend-card-inner"><img class="friend-avatar" src="gauri.png" alt="Gauri"/><p class="card-name">Gauri Marwadkar</p><p class="card-company">@Microland</p></div></div>
+      <div class="friend-card" onclick="openExp('rutuja')"><div class="friend-card-inner"><img class="friend-avatar" src="rutuja.png" alt="Rutuja"/><p class="card-name">Rutuja Sawant</p><p class="card-company">@PegaSystem</p></div></div>
+      <div class="friend-card" onclick="openExp('bhairvnath')"><div class="friend-card-inner"><img class="friend-avatar" src="bhairvnath.png" alt="Bhairvnath"/><p class="card-name">Bhairvnath Bhuse</p><p class="card-company">@Capgemini</p></div></div>
+      <div class="friend-card" onclick="openExp('etisha')"><div class="friend-card-inner"><img class="friend-avatar" src="etisha.png" alt="Etisha"/><p class="card-name">Etisha Pednekar</p><p class="card-company">@Cognizant</p></div></div>
+      <div class="friend-card" onclick="openExp('chakradhar')"><div class="friend-card-inner"><img class="friend-avatar" src="chakrdhar.jpeg" alt="Chakradhar"/><p class="card-name">Chakradhar Malage</p><p class="card-company">@Capgemini</p></div></div>
+      <div class="friend-card" onclick="openExp('anushka')"><div class="friend-card-inner"><img class="friend-avatar" src="anushka.png" alt="Anushka"/><p class="card-name">Anushka Sao</p><p class="card-company">@HSBC</p></div></div>
+      <div class="friend-card" onclick="openExp('pratik')"><div class="friend-card-inner"><img class="friend-avatar" src="pratik.png" alt="Pratik"/><p class="card-name">Pratik Borse</p><p class="card-company">@Cognizant</p></div></div>
+      <div class="friend-card" onclick="openExp('mansi')"><div class="friend-card-inner"><img class="friend-avatar" src="mansi.png" alt="Mansi"/><p class="card-name">Mansi Sonawane</p><p class="card-company">@UKG</p></div></div>
+      <div class="friend-card" onclick="openExp('apurva')"><div class="friend-card-inner"><img class="friend-avatar" src="apurva.png" alt="Apurva"/><p class="card-name">Apurva Kosti</p><p class="card-company">@Synechron</p></div></div>
+      <div class="friend-card" onclick="openExp('niranjan')"><div class="friend-card-inner"><img class="friend-avatar" src="niranjan.JPG" alt="Niranjan"/><p class="card-name">Niranjan Yadav</p><p class="card-company">@LTIMindtree</p></div></div>
+      <div class="friend-card" onclick="openExp('sumit')"><div class="friend-card-inner"><img class="friend-avatar" src="sumit.png" alt="Sumit"/><p class="card-name">Sumit Dhawale</p><p class="card-company">@DataEconomy</p></div></div>
+      <div class="friend-card" onclick="openExp('akshay')"><div class="friend-card-inner"><img class="friend-avatar" src="akshay.png" alt="Akshay"/><p class="card-name">Akshay Bade</p><p class="card-company">@EdgeVerve</p></div></div>
+      <div class="friend-card" onclick="openExp('mahesh')"><div class="friend-card-inner"><img class="friend-avatar" src="mahesh.png" alt="Mahesh"/><p class="card-name">Mahesh Raut</p><p class="card-company">@ConnectWise</p></div></div>
+      <div class="friend-card" onclick="openExp('nikhil')"><div class="friend-card-inner"><img class="friend-avatar" src="nikhil.png" alt="Nikhil"/><p class="card-name">Nikhil Takle</p><p class="card-company">@Alfa Laval</p></div></div>
+      <div class="friend-card" onclick="openExp('vaibhavi')"><div class="friend-card-inner"><img class="friend-avatar" src="vaibhavi.png" alt="Vaibhavi"/><p class="card-name">Vaibhavi Dixit</p><p class="card-company">@Visteon</p></div></div>
+      <div class="friend-card" onclick="openExp('tejal')"><div class="friend-card-inner"><img class="friend-avatar" src="tejal.png" alt="Tejal"/><p class="card-name">Tejal Thombre</p><p class="card-company">@LTIMindtree</p></div></div>
+      <div class="friend-card" onclick="openExp('nandana')"><div class="friend-card-inner"><img class="friend-avatar" src="nandana.jpg" alt="Nandana"/><p class="card-name">Nandana</p><p class="card-company">@Tech Mahindra</p></div></div>
+      <div class="friend-card" onclick="openExp('pranit')"><div class="friend-card-inner"><img class="friend-avatar" src="pranit.png" alt="Pranit"/><p class="card-name">Pranit Mane</p><p class="card-company">@IBM</p></div></div>
+      <div class="friend-card" onclick="openExp('bendre')"><div class="friend-card-inner"><img class="friend-avatar" src="bendre.png" alt="Anushka Bendre"/><p class="card-name">Anushka Bendre</p><p class="card-company">@HCLTech</p></div></div>
+      <div class="friend-card" onclick="openExp('swati')"><div class="friend-card-inner"><img class="friend-avatar" src="swati.png" alt="Swati"/><p class="card-name">Swati Rangate</p><p class="card-company">@Euronet</p></div></div>
+      <div class="friend-card" onclick="openExp('prachi')"><div class="friend-card-inner"><img class="friend-avatar" src="praachi.png" alt="Prachi"/><p class="card-name">Prachi Gujrathi</p><p class="card-company">@L&amp;T</p></div></div>
+      <div class="friend-card" onclick="openExp('sakshi')"><div class="friend-card-inner"><img class="friend-avatar" src="sakshi.png" alt="Sakshi"/><p class="card-name">Sakshi Patil</p><p class="card-company">@Mthree</p></div></div>
+      <div class="friend-card" onclick="openExp('shreyash')"><div class="friend-card-inner"><img class="friend-avatar" src="shreyash.png" alt="Shreyash"/><p class="card-name">Shreyash Kulkarni</p><p class="card-company">@Cloud4C</p></div></div>
+      <div class="friend-card" onclick="openExp('tanishka')"><div class="friend-card-inner"><img class="friend-avatar" src="tanishka.png" alt="Tanishka"/><p class="card-name">Tanishka Dhole</p><p class="card-company">@TraceLink</p></div></div>
+      <div class="friend-card" onclick="openExp('arjun')"><div class="friend-card-inner"><img class="friend-avatar" src="arjun.jpeg" alt="Arjun"/><p class="card-name">Arjun Patil</p><p class="card-company">@UKG</p></div></div>
+    </div>
+  </div>
+  <div class="scroll-nav"><button class="scroll-btn" onclick="scrollTrack('friend-track',-1)">←</button><button class="scroll-btn" onclick="scrollTrack('friend-track',1)">→</button></div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- TOPICS -->
+<section class="section" id="topics">
+  <div class="section-header reveal">
+    <div class="section-tag">03 · Preparation</div>
+    <h2 class="section-title">Important Interview Topics</h2>
+    <div class="chip-row"><span class="chip chip-pink">DSA</span><span class="chip chip-pink">OOP</span><span class="chip chip-pink">DBMS</span><span class="chip chip-pink">Networks</span></div>
+  </div>
+  <div class="scroll-track-wrapper reveal">
+    <div class="scroll-track" id="topic-track">
+      <div class="topic-card" onclick="openExp('array')"><div class="topic-card-inner"><img src="array.png" alt="Array"/><p class="card-name">Array</p><p class="card-sub">Data Structures</p></div></div>
+      <div class="topic-card" onclick="openExp('string')"><div class="topic-card-inner"><img src="string.png" alt="String"/><p class="card-name">String</p><p class="card-sub">Data Structures</p></div></div>
+      <div class="topic-card" onclick="openExp('basics')"><div class="topic-card-inner"><img src="basics.png" alt="Basics"/><p class="card-name">Basics Problems</p><p class="card-sub">Most Asked</p></div></div>
+      <div class="topic-card" onclick="openExp('algo')"><div class="topic-card-inner"><img src="algo.png" alt="Algorithms"/><p class="card-name">Algorithms</p><p class="card-sub">Problems</p></div></div>
+      <div class="topic-card" onclick="openExp('linkedlist')"><div class="topic-card-inner"><img src="linkedlist.png" alt="Linked List"/><p class="card-name">Linked List</p><p class="card-sub">Data Structures</p></div></div>
+      <div class="topic-card" onclick="openExp('stack')"><div class="topic-card-inner"><img src="stack.png" alt="Stack"/><p class="card-name">Stack</p><p class="card-sub">Questions</p></div></div>
+      <div class="topic-card" onclick="openExp('queue')"><div class="topic-card-inner"><img src="queue.png" alt="Queue"/><p class="card-name">Queue</p><p class="card-sub">Questions</p></div></div>
+      <div class="topic-card" onclick="openExp('sorting')"><div class="topic-card-inner"><img src="sorting.png" alt="Sorting"/><p class="card-name">Sorting &amp; Searching</p><p class="card-sub">Algorithms</p></div></div>
+      <div class="topic-card" onclick="openExp('oop')"><div class="topic-card-inner"><img src="oop.png" alt="OOP"/><p class="card-name">OOP</p><p class="card-sub">Programming</p></div></div>
+      <div class="topic-card" onclick="openExp('sql')"><div class="topic-card-inner"><img src="sql.png" alt="SQL"/><p class="card-name">DBMS &amp; MySQL</p><p class="card-sub">Databases</p></div></div>
+      <div class="topic-card" onclick="openExp('cn')"><div class="topic-card-inner"><img src="cn.png" alt="Computer Networks"/><p class="card-name">Computer Networks</p><p class="card-sub">Networking</p></div></div>
+    </div>
+  </div>
+  <div class="scroll-nav"><button class="scroll-btn" onclick="scrollTrack('topic-track',-1)">←</button><button class="scroll-btn" onclick="scrollTrack('topic-track',1)">→</button></div>
+</section>
+
+<div class="section-divider"></div>
+
+<footer>
+  <div style="max-width:600px;margin:0 auto">
+    <div class="footer-logo">Interview Experience Hub</div>
+    <p class="footer-text">A curated collection of real interview experiences from DIT Batch 2025 engineers.<br/>Built to help future aspirants prepare smarter and land their dream roles.</p>
+    <div class="footer-line"></div>
+    <p class="footer-copy">© 2025 Rohan Sakhare · DIT Pune · Made with ♥ for fellow engineers</p>
+  </div>
+</footer>
+
+</div>
+
+<script>
+const EXPERIENCES = {
+  "6d": `<header>
+    <h1>📡 My Interview Experience at 6D Technologies – Campus Placement</h1>
+    <p>📍 Online Interview | Company HQ: Bangalore | Domain: Telecom Product Development</p>
   </header>
 
-  <!-- Your Interview Experience Section -->
-  <section class="company-scroller">
-    <h2>🧭 Explore My Interview Experiences</h2>
-    <div class="company-container">
-      <div class="company-card" onclick="goToCompany('euronet')">
-        <img src="euronet.png" alt="Euronet"/>
-        <p>Euronet</p>
-      </div>
-      <div class="company-card" onclick="goToCompany('jar')">
-        <img src="jar.png" alt="jar"/>
-        <p>Jar</p>
-      </div>
-      <div class="company-card" onclick="goToCompany('swiggy')">
-        <img src="swiggy.png" alt="swiggy"/>
-        <p>Swiggy</p>
-      </div>
-      <div class="company-card" onclick="goToCompany('frnd')">
-        <img src="frnd.png" alt="frnd"/>
-        <p>FRND</p>
-      </div>
-      <div class="company-card" onclick="goToCompany('siemens')">
-        <img src="siemens.png" alt="siemens"/>
-        <p>Siemens</p>
-      </div>
-      <div class="company-card" onclick="goToCompany('mindsprint')">
-        <img src="mindsprint.png" alt="mindsprint"/>
-        <p>MindSprint</p>
-      </div>
-      <div class="company-card" onclick="goToCompany('brainvire')">
-        <img src="brainvire.png" alt="brainvire"/>
-        <p>Brainvire</p>
-      </div>
-      <div class="company-card" onclick="goToCompany('namekart')">
-        <img src="namekart.png" alt="namekart"/>
-        <p>Namekart</p>
-      </div>
-      <div class="company-card" onclick="goToCompany('cognizant')">
-        <img src="cognizant.png" alt="cognizant"/>
-        <p>Cognizant</p>
-      </div>
-      <div class="company-card" onclick="goToCompany('xalta')">
-        <img src="xalta.png" alt="xalta"/>
-        <p>Xalta</p>
-      </div>
-      <div class="company-card" onclick="goToCompany('moschip')">
-        <img src="moschip.png" alt="moschip"/>
-        <p>Moschip</p>
-      </div>
-      <div class="company-card" onclick="goToCompany('accenture')">
-        <img src="accenture.png" alt="accenture"/>
-        <p>Accenture</p>
-      </div>
-      <div class="company-card" onclick="goToCompany('vistex')">
-        <img src="vistex.png" alt="vistex"/>
-        <p>Vistex</p>
-      </div>
-      <div class="company-card" onclick="goToCompany('6d')">
-        <img src="6d.png" alt="6D"/>
-        <p>6D Technologies</p>
-      </div>
-      <div class="company-card" onclick="goToCompany('revature')">
-        <img src="revature.png" alt="Revature"/>
-        <p>Revature</p>
-      </div>
-      <div class="company-card" onclick="goToCompany('microland')">
-        <img src="microland.png" alt="Microland"/>
-        <p>Microland</p>
-      </div>
-      <div class="company-card" onclick="goToCompany('capsitech')">
-        <img src="capsitech.png" alt="capsitech"/>
-        <p>Capsitech</p>
-      </div>
-      <div class="company-card" onclick="goToCompany('portway')">
-        <img src="portway.png" alt="portway"/>
-        <p>Portway International</p>
-      </div>
-      <div class="company-card" onclick="goToCompany('avaali')">
-        <img src="avaali.png" alt="avaali"/>
-        <p>Avaali</p>
-      </div>
-      <div class="company-card" onclick="goToCompany('optimum')">
-        <img src="optimum.png" alt="optimum"/>
-        <p>Optimum Financial Solutions</p>
-      </div>
+  <main style="padding: 2rem; line-height: 1.7;">
+    <p><strong>6D Technologies</strong>, a telecommunications product company headquartered in Bangalore, visited our college for a campus recruitment drive. I was <strong>shortlisted based on my resume</strong> and invited for the interview process.</p>
+
+    <h2>💻 Round 1: Online Technical Interview</h2>
+    <p>This round was conducted online and involved a mix of coding and theoretical questions. The questions were mainly basic to medium level. Here's what they asked:</p>
+    
+    <ul>
+      <li>🧮 Coding questions: Basic level</li>
+      <li>🧠 C Programming:
+        <ul>
+          <li>What is <code>if-else</code>?</li>
+          <li>How does <code>switch-case</code> work?</li>
+          <li>Usage of <code>break</code> and <code>continue</code></li>
+          <li>What is a <code>static</code> keyword?</li>
+          <li>What is a <code>friend</code> function?</li>
+        </ul>
+      </li>
+      <li>💡 OOP Concepts: Basic definitions and examples</li>
+      <li>🗄️ MySQL:
+        <ul>
+          <li>Difference between <strong>DDL</strong> and <strong>DML</strong></li>
+        </ul>
+      </li>
+    </ul>
+
+    <h2>📌 Final Thoughts</h2>
+    <p>The overall interview was quite balanced — <strong>not too hard</strong>, and most questions were based on <strong>fundamentals</strong>. A good understanding of C, OOP, and basic SQL is sufficient for cracking this kind of interview.</p>
+  </main>`,
+  "accenture": `<header>
+    <h1>🚀 My Interview Experience at Accenture – Campus Placement</h1>
+    <p>📍 Campus Drive | College-Based Assessment | Ongoing Status</p>
+  </header>
+
+  <main style="padding: 2rem; line-height: 1.7;">
+    <p><strong>Accenture</strong> visited our college for a <strong>campus placement drive</strong>. I was shortlisted for the initial assessment, which was conducted in our college’s computer lab.</p>
+
+    <h2>📝 Assessment Round</h2>
+    <p>The assessment included multiple sections such as aptitude, logical reasoning, and verbal ability. After clearing these sections, I was shortlisted for the next round — <strong>coding</strong>.</p>
+
+    <h2>💻 Coding Round</h2>
+    <p>In the coding round, there were two questions:</p>
+    <ul>
+      <li>🔹 One <strong>medium-level</strong> coding question</li>
+      <li>🔹 One <strong>hard-level</strong> coding question</li>
+    </ul>
+    <p>I successfully solved both problems and was selected for the next round — <strong>communication round</strong>.</p>
+
+    <h2>🗣️ Communication Round</h2>
+    <p>This round focused on:
+      <ul>
+        <li>✅ English fluency</li>
+        <li>✅ Grammar</li>
+        <li>✅ Sentence formation and listening comprehension</li>
+      </ul>
+    </p>
+    <p>After clearing the communication round, I received an email to schedule my interview. I chose my slot on <strong>11th September</strong>.</p>
+
+    <h2>🤝 Interview Experience</h2>
+    <p>The interview was mainly HR-based and went very well — I would say around <strong>95% good</strong>. The interviewer asked me:</p>
+    <ul>
+      <li>✅ Tell me about yourself</li>
+      <li>✅ What are your hobbies?</li>
+      <li>✅ Tell me about your college extracurriculars</li>
+      <li>✅ Any experience with college clubs or sports?</li>
+      <li>✅ Your family background</li>
+      <li>✅ Situational and conditional-type questions</li>
+    </ul>
+
+    <p>The overall experience was very smooth and friendly. I felt confident during the conversation and shared all answers genuinely.</p>
+
+    <h2>📌 Final Status</h2>
+    <p>As of now, the <strong>results are pending</strong>. Not only for me but also for all students who appeared for the interview. Hoping for a positive outcome!</p>
+
+    <h2>💡 Takeaway</h2>
+    <p>This interview helped me gain confidence in communication rounds and HR-style conversations. Whether selected or not, the experience was valuable and uplifting.</p>
+
+    <p><strong>Tip for others:</strong> Practice speaking clearly, stay confident, and be honest during HR interviews. Sometimes, your personality makes the strongest impression.</p>
+  </main>`,
+  "akshay": `<header>
+    <h1>Akshay Bade</h1>
+    <p>Interview Experience @ EdgeVerve</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>EdgeVerve - Software Role</h2>
+
+    <p><strong>Round 1: Online Coding Assessment</strong><br/>
+    This round had 3 coding questions of medium to hard difficulty.<br/>
+    <ul>
+      <li>You needed to solve at least 2 out of 3 to qualify.</li>
+      <li>Plagiarism was strictly checked.</li>
+    </ul>
+    </p>
+
+    <p><strong>Round 2: Technical Interview</strong><br/>
+    <ul>
+      <li>Data Structures and Algorithms (DSA) problem-solving</li>
+      <li>Questions based on core computer science fundamentals</li>
+    </ul>
+    </p>
+
+    <p><strong>Round 3: HR Interview</strong><br/>
+    <ul>
+      <li>General discussion</li>
+      <li>Questions about location preferences and availability</li>
+    </ul>
+    </p>
+
+    <p><strong>Overall:</strong> The process was smooth and easy.</p>
+
+    <p><strong>Result:</strong> Selected at EdgeVerve</p>
+
+    <p>This experience was shared by <strong>Akshay Bade</strong>.</p>
+
+    
+  </div>`,
+  "algo": `<h1>📝 Basic Most Asked Programming Questions</h1>
+
+  <div class="problem-list">
+    <ol>
+      <li>Triple Sum for Same Values</li>
+      <li>Absolute Difference with 51</li>
+      <li>Check 30 or Sum 30</li>
+      <li>Within 10 of 100 or 200</li>
+      <li>Add 'if' to String</li>
+      <li>Remove Character from String</li>
+      <li>Swap First and Last Characters</li>
+      <li>4 Copies of First 2 Characters</li>
+      <li>Add Last Character to Front and Back</li>
+      <li>Multiple of 3 or 7</li>
+      <li>Add First 3 Characters to Front and Back</li>
+      <li>Check If String Starts with 'C#'</li>
+      <li>Temperature Less than 0 or Greater than 100</li>
+      <li>Check if Integers are in Range 100–200</li>
+      <li>Check if Integers are in Range 20–50</li>
+      <li>Check if Either Integer is in Range 20–50</li>
+      <li>Remove 'yt' at Index 1</li>
+      <li>Largest of Three Integers</li>
+      <li>Closest to 100</li>
+      <li>Check Two Integers in Ranges 40–50 or 50–60</li>
+      <li>Larger Value in Range 20–30</li>
+      <li>Check 2–4 'z' Characters</li>
+      <li>Same Last Digit for Integers</li>
+      <li>n Copies of String</li>
+      <li>n Copies of First 3 Characters</li>
+      <li>Count 'aa' in String</li>
+      <li>Check 'aa' Immediately After First 'a'</li>
+      <li>String with Every Other Character</li>
+      <li>Create Sequence String</li>
+      <li>Count Substrings of Length 2</li>
+      <li>Check Sequence 1, 2, 3 in Array</li>
+      <li>Compare Strings for Same Length 2 Substrings</li>
+      <li>Remove Specified Character Except at Ends</li>
+      <li>Characters at Index 0, 1, 4, 5, ...</li>
+      <li>Count Consecutive 5's in Array</li>
+      <li>Check for Triple in Array</li>
+      <li>Sum of Integers, Return 30 in Range 10–20</li>
+      <li>Check if 5, Sum 5, or Difference 5</li>
+      <li>Multiple of 13 or One More</li>
+      <li>Multiple of 3 or 7 but Not Both</li>
+      <li>Within 2 of Multiple of 10</li>
+      <li>Return 18 if Integer in Range 10–20</li>
+      <li>Check String Starts with 'F' or Ends with 'B'</li>
+      <li>Add Two Integers to Get Third</li>
+      <li>Check y > x and z > y</li>
+      <li>Strict Increasing Order with Equality Option</li>
+      <li>Same Rightmost Digit for Non-Negative Integers</li>
+      <li>20 Less Than Another Integer</li>
+      <li>Larger Integer or Smaller with Same Remainder Modulo 7</li>
+      <li>Shared Digit Between Two Integers (Range 10–99)</li>
+      <li>Sum with Same Number of Digits or Return x</li>
+      <li>Sum or Third Integer if Two are Equal</li>
+      <li>Sum Ignoring 13 and Right Values</li>
+      <li>Sum with 10–20 Treated as Zero Except 13/17</li>
+      <li>Nearest to 13 Without Crossing Over</li>
+      <li>Equal Differences for Three Integers</li>
+      <li>String Format s1s2s2s1</li>
+      <li>Insert String in Middle of Another</li>
+      <li>Three Copies of Last Two Characters</li>
+      <li>First Two Characters or Full String if Less Than 2</li>
+      <li>First Half of Even-Length String</li>
+      <li>Remove First and Last Characters</li>
+      <li>Long+Short+Long String Combination</li>
+      <li>Combine Strings Without First Characters</li>
+      <li>Move First Two Characters to End</li>
+      <li>String Without First and Last Characters</li>
+      <li>Two Middle Characters of Even-Length String</li>
+    </ol>
+  </div>`,
+  "anushka": `<header>
+    <h1>Anushka Sao</h1>
+    <p>Interview Experience @ HSBC</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>HSBC - Interview Process</h2>
+
+    <p><strong>Timeline:</strong><br/>
+    The process is expected around August–September. All rounds were conducted on-campus, and updates were shared through the official WhatsApp group.</p>
+
+    <p><strong>Round 1: Aptitude & Technical MCQ Test</strong><br/>
+    The first round was an online test consisting of aptitude questions along with technical MCQs from core CS subjects.</p>
+
+    <p><strong>Round 2: DSA Coding Round</strong><br/>
+    This round had 2 DSA-based coding questions. Questions were of medium difficulty and tested problem-solving ability.</p>
+
+    <p><strong>Round 3: Technical Interview</strong><br/>
+    Focus areas included core CS fundamentals like DBMS, OOPs, and understanding every line of the code from your academic/project work. Be ready to discuss your resume and explain the logic behind your project.</p>
+
+    <p><strong>Round 4: HR Interview</strong><br/>
+    General behavioral and situational questions were asked, along with discussions on your strengths, career goals, and background.</p>
+
+    <p><strong>Preparation Tips:</strong></p>
+    <ul>
+      <li>Focus on CS fundamentals: DBMS and OOPs are very important.</li>
+      <li>Practice basic DSA problems (arrays, strings, sorting, etc.).</li>
+      <li>Know your project thoroughly—every single line of it.</li>
+      <li>Stay updated with announcements via the WhatsApp group.</li>
+    </ul>
+
+    <p><strong>Result:</strong> Selected in HSBC</p>
+
+    
+  </div>`,
+  "apurva": `<header>
+    <h1>Apurva Kosti</h1>
+    <p>Interview Experience @ Synechron Technologies Pvt. Limited</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>Synechron Technologies Pvt. Limited - Software Developer</h2>
+
+    <p><strong>Round 1: Online Assessment</strong><br/>
+    This round included:
+    <ul>
+      <li>Basic aptitude questions</li>
+      <li>Easy-level coding problems</li>
+      <li>Grammar-based questions</li>
+    </ul>
+    It tested logical reasoning, verbal ability, and programming fundamentals.</p>
+
+    <p><strong>Round 2: Coding Assessment</strong><br/>
+    Conducted at the company premises. Candidates were divided based on preferred language – Java or Python.<br/>
+    Topics covered:
+    <ul>
+      <li>Arrays</li>
+      <li>Strings</li>
+      <li>HashMap</li>
+      <li>Bit Manipulation</li>
+      <li>Stack and Queues</li>
+    </ul>
+    There were two coding questions of easy to medium difficulty.</p>
+
+    <p><strong>Round 3: Technical Interviews</strong><br/>
+    Two technical rounds (~15–20 minutes each), covering:
+    <ul>
+      <li>Core and Advanced Java</li>
+      <li>OOPs concepts</li>
+      <li>Final Year Project discussion</li>
+      <li>Basic introduction and resume-based questions</li>
+    </ul>
+    </p>
+
+    <p><strong>Round 4: HR Interview</strong><br/>
+    Duration: ~30 minutes. Topics included:
+    <ul>
+      <li>Complete resume discussion</li>
+      <li>Relocation preferences</li>
+      <li>General behavioral questions</li>
+    </ul>
+    </p>
+
+    <p><strong>Round 5: Topic Writing</strong><br/>
+    Candidates were given four topics to choose from and had to write on one. This was a non-elimination round to assess written communication skills.</p>
+
+    <p><strong>Result:</strong> Selected at Synechron Technologies Pvt. Limited</p>
+
+    <p>This experience was shared by <strong>Apurva Kosti</strong>, a friend of Rohan Sakhare.</p>
+
+    
+  </div>`,
+  "arjun": `<header>
+    <h1>Arjun Patil</h1>
+    <p>Interview Experience @ UKG</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>🎯 Selected at UKG</h2>
+
+    <p><strong>Selection Process:</strong> The entire process included four rounds:</p>
+
+    <ol>
+      <li><strong>✅ Coding Test:</strong><br/>
+        - Questions based on Java, C++, and SQL<br/>
+        - Focused on problem-solving and logic-building
+      </li>
+
+      <li><strong>✅ Technical Interview:</strong><br/>
+        - Two Java-based coding questions on Arrays and LinkedLists<br/>
+        - Detailed discussion on final year project, including implementation and role
+      </li>
+
+      <li><strong>✅ Managerial Round:</strong><br/>
+        - Situation-based and behavioral questions<br/>
+        - Focused on decision-making, leadership, and team management capabilities
+      </li>
+
+      <li><strong>✅ HR Interview:</strong><br/>
+        - Questions about personal background, future goals, and preferred location<br/>
+        - General discussion on project and personality fit
+      </li>
+    </ol>
+
+    <p><strong>💡 Verdict:</strong> <span style="color:lightgreen;"><strong>Selected</strong></span></p>
+
+    <p>This experience was shared by <strong>Arjun Patil</strong>, a friend of Rohan Sakhare.</p>
+
+    
+  </div>`,
+  "array": `<h1>📘 Array - Data Structure Topics</h1>
+  <p style="text-align:center;">Explore the most asked array problems in interviews, categorized by difficulty.</p>
+
+  <div class="section">
+    <div class="category">🟢 Easy Problems</div>
+    <div class="problem-list">
+      <ul>
+        <li>Second Largest Element</li>
+        <li>Third Largest Element</li>
+        <li>Three Great Candidates</li>
+        <li>Max Consecutive Ones</li>
+        <li>Move All Zeroes To End</li>
+        <li>Reverse Array in Groups</li>
+        <li>Rotate Array</li>
+        <li>Wave Array</li>
+        <li>Plus One</li>
+        <li>Stock Buy and Sell – One Transaction</li>
+        <li>Repetitive Addition Of Digits</li>
+        <li>Remove All Occurrences of Element</li>
+        <li>Remove Duplicates from Sorted Array</li>
+        <li>Alternate Positive Negative</li>
+        <li>Insert Duplicate Element</li>
+        <li>Array Leaders</li>
+        <li>Missing and Repeating in Array</li>
+        <li>Missing Ranges of Numbers</li>
+      </ul>
     </div>
-  </section>
+  </div>
 
-  <!-- Friends' Interview Experience Section -->
-  <section class="friend-scroller">
-    <h2>📚 My Friend's Interview Experiences</h2>
-    <div class="friend-container">
-      <div class="friend-card" onclick="goToFriend('pumang')">
-        <img src="pumang.png" alt="Pumang Kirange" />
-        <p>Pumang Kirange</p>
-        <p>@Capgemini &  Ex-intern TraceLink </p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('atharva')">
-        <img src="atharva.png" alt="Atharva Athanikar" />
-        <p>Atharva Athanikar</p>
-        <p>@Merkle</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('suraj')">
-        <img src="suraj.jpg" alt="Suraj Fartale" />
-        <p>Suraj Fartale</p>
-        <p>@Goldman Sachs</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('suhelali')">
-        <img src="suhelali.png" alt="Suhelali Pakjade" />
-        <p>Suhelali Pakjade</p>
-        <p>@Juspay</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('omkar')">
-        <img src="omkar.png" alt="Omkar Nawale" />
-        <p>Omkar Nawale</p>
-        <p>@HSBC</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('priyanka')">
-        <img src="priyanka.png" alt="Priyanka Thakur" />
-        <p>Priyanka Thakur</p>
-        <p>@NICE</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('tushar')">
-        <img src="tushar.png" alt="Tushar Gosavi" />
-        <p>Tushar Gosavi</p>
-        <p>@Cognizant</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('devdatt')">
-        <img src="devdatt.png" alt="Devdatt Khilare" />
-        <p>Devdatt Khilare</p>
-        <p>@MindSprint</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('gauri')">
-        <img src="gauri.png" alt="Gauri Marwadkar" />
-        <p>Gauri Marwadkar</p>
-        <p>@Microland</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('rutuja')">
-        <img src="rutuja.png" alt="Rutuja Sawant" />
-        <p>Rutuja Sawant</p>
-        <p>@PegaSystem</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('bhairvnath')">
-        <img src="bhairvnath.png" alt="Bhairvnath Bhuse" />
-        <p>Bhairvnath Bhuse</p>
-        <p>@Capgemini</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('etisha')">
-        <img src="etisha.png" alt="Etisha Pednekar" />
-        <p>Etisha Pednekar</p>
-        <p>@Cognizant</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('chakradhar')">
-        <img src="chakrdhar.jpeg" alt="Chakradhar Malage" />
-        <p>Chakradhar Malage</p>
-        <p>@Capgemini</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('anushka')">
-        <img src="anushka.png" alt="Anushka Sao" />
-        <p>Anushka Sao</p>
-        <p>@HSBC</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('pratik')">
-        <img src="pratik.png" alt="Pratik Borse" />
-        <p>Pratik Borse</p>
-        <p>@Cognizant</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('mansi')">
-        <img src="mansi.png" alt="Mansi Sonawane" />
-        <p>Mansi Sonawane</p>
-        <p>@UKG</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('apurva')">
-        <img src="apurva.png" alt="Apurva Kosti" />
-        <p>Apurva Kosti</p>
-        <p>@Synechron</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('niranjan')">
-        <img src="niranjan.JPG" alt="Niranjan Yadav" />
-        <p>Niranjan Yadav</p>
-        <p>@LTIMindtree</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('sumit')">
-        <img src="sumit.png" alt="Sumit Dhawale" />
-        <p>Sumit Dhawale</p>
-        <p>@DataEconomy</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('akshay')">
-        <img src="akshay.png" alt="Akshay Bade" />
-        <p>Akshay Bade</p>
-        <p>@EdgeVerve</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('mahesh')">
-        <img src="mahesh.png" alt="Mahesh Raut" />
-        <p>Mahesh Raut</p>
-        <p>@ConnectWise</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('nikhil')">
-        <img src="nikhil.png" alt="Nikhil Takle" />
-        <p>Nikhil Takle</p>
-        <p>@Alfa Laval</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('vaibhavi')">
-        <img src="vaibhavi.png" alt="Vaibhavi Dixit" />
-        <p>Vaibhavi Dixit</p>
-        <p>@Visteon</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('tejal')">
-        <img src="tejal.png" alt="Tejal Thombre" />
-        <p>Tejal Thombre</p>
-        <p>@LTIMindtree</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('nandana')">
-        <img src="nandana.jpg" alt="Nandana" />
-        <p>Nandana</p>
-        <p>@Tech Mahindra</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('pranit')">
-        <img src="pranit.png" alt="Pranit Mane" />
-        <p>Pranit Mane</p>
-        <p>@IBM</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('bendre')">
-        <img src="bendre.png" alt="Anushka Bendre" />
-        <p>Anushka Bendre</p>
-        <p>@HCLTech</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('swati')">
-        <img src="swati.png" alt="Swati Rangate" />
-        <p>Swati Rangate</p>
-        <p>@Euronet</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('prachi')">
-        <img src="praachi.png" alt="Prachi Gujrathi" />
-        <p>Prachi Gujrathi</p>
-        <p>@L&T</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('sakshi')">
-        <img src="sakshi.png" alt="Sakshi Patil" />
-        <p>Sakshi Patil</p>
-        <p>@Mthree</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('shreyash')">
-        <img src="shreyash.png" alt="Shreyash Kulkarni’" />
-        <p>Shreyash Kulkarni</p>
-        <p>@Cloud4C</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('tanishka')">
-        <img src="tanishka.png" alt="Tanishka Dhole" />
-        <p>Tanishka Dhole</p>
-        <p>@TraceLink</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('arjun')">
-        <img src="arjun.jpeg" alt="Arjun Patil" />
-        <p>Arjun Patil</p>
-        <p>@UKG</p>
-      </div>
-      
-
-
-      
+  <div class="section">
+    <div class="category">🟡 Medium Problems</div>
+    <div class="problem-list">
+      <ul>
+        <li>Next Permutation</li>
+        <li>Majority Element</li>
+        <li>Majority Element II</li>
+        <li>Stock Buy and Sell – Multiple Transactions</li>
+        <li>Minimize the Heights II</li>
+        <li>Maximum Subarray Sum</li>
+        <li>Maximum Product Subarray</li>
+        <li>Product of Array Except Self</li>
+        <li>Subarrays with Product Less Than K</li>
+        <li>Split Into Three Equal Sum Segments</li>
+        <li>Maximum Consecutive 1s After Flipping 0s</li>
+        <li>Last Moment Before Ants Fall Out of Plank</li>
+        <li>Find 0 with Farthest 1s in a Binary</li>
+        <li>Intersection of Interval Lists</li>
+        <li>Rearrange Array Elements by Sign</li>
+        <li>Meeting Scheduler for Two Persons</li>
+        <li>Longest Mountain Subarray</li>
+        <li>Transform and Sort Array</li>
+        <li>Minimum Swaps To Group All Ones</li>
+        <li>Minimum Moves To Equalize Array</li>
+        <li>Minimum Indices To Equal Even-Odd Sums</li>
+      </ul>
     </div>
-  </section>
+  </div>
 
-  <!-- Important Topics For Interview Preparation -->
-  <section class="friend-scroller">
-    <h2>Important Topics For Interview Preparation</h2>
-    <div class="friend-container">
-      <div class="friend-card" onclick="goToFriend('array')">
-        <img src="array.png" alt="Array" />
-        <p>Array</p>
-        <p>Data structures</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('string')">
-        <img src="string.png" alt="String" />
-        <p>String</p>
-        <p>Data structures</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('basics')">
-        <img src="basics.png" alt="Basics" />
-        <p>Basics Problems</p>
-        <p>Most Asked</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('algo')">
-        <img src="algo.png" alt="Algorithms" />
-        <p>Algorithms </p>
-        <p>Problems</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('linkedlist')">
-        <img src="linkedlist.png" alt="linked list" />
-        <p>Linked </p>
-        <p>list</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('stack')">
-        <img src="stack.png" alt="Stack Questions" />
-        <p>Stack </p>
-        <p>Questions</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('queue')">
-        <img src="queue.png" alt="Queue Questions" />
-        <p>Queue </p>
-        <p>Questions</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('sorting')">
-        <img src="sorting.png" alt="Sorting & Searching" />
-        <p>Sorting & </p>
-        <p>Searching</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('oop')">
-        <img src="oop.png" alt="oop" />
-        <p>Object Originated  </p>
-        <p>Programming</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('sql')">
-        <img src="sql.png" alt="sql" />
-        <p>DBMS & </p>
-        <p>MySQL</p>
-      </div>
-      <div class="friend-card" onclick="goToFriend('cn')">
-        <img src="cn.png" alt="cn" />
-        <p>Computer  </p>
-        <p> Network </p>
-      </div>
-      
-      
+  <div class="section">
+    <div class="category">🔴 Hard Problems</div>
+    <div class="problem-list">
+      <ul>
+        <li>Trapping Rain Water</li>
+        <li>Maximum Circular Subarray Sum</li>
+        <li>Smallest Missing Positive Number</li>
+        <li>Jump Game</li>
+        <li>Closest Subsequence Sum</li>
+        <li>Smallest Non-Representable Sum in Array</li>
+        <li>Smallest Range Having Elements From K Lists</li>
+        <li>Candy Distribution</li>
+        <li>Count Subarrays with K Distinct Elements</li>
+        <li>Next Smallest Palindrome</li>
+        <li>Maximum Sum Among All Rotations</li>
+      </ul>
     </div>
-  </section>
+  </div>`,
+  "atharva": `<header>
+    <h1>Atharva Athanikar</h1>
+    <p>Interview Experience @ Merkle</p>
+  </header>
 
-  <script src="script.js"></script>
+  <div class="experience-container">
+    <h2>Merkle - Analyst Role</h2>
+
+    <p><strong>Round 1: Aptitude Test</strong><br/>
+    Covered quantitative aptitude, logical reasoning, and verbal reasoning. Time management was crucial.</p>
+
+    <p><strong>Round 2: Group Discussion</strong><br/>
+    Two topics were given (30 mins each):</p>
+    <ul>
+      <li>Learning or Training: Which is more impactful and why?</li>
+      <li>Will AI replace humans?</li>
+    </ul>
+
+    <p><strong>Round 3: Technical Interview</strong><br/>
+    Discussed preferred role (Data Scientist or Data Engineer) and programming language (Java or Python). Resume-based questions including project work, certifications, and technical skills.</p>
+
+    <p><strong>Round 4: Managerial Interview 1</strong><br/>
+    Focused on resume and projects. One coding question: Find common elements from two array lists using preferred language. Also discussed tools used in data analytics.</p>
+
+    <p><strong>Round 5: Managerial Interview 2</strong><br/>
+    SQL-based questions, including writing a query to find the 3rd highest salary from a table. Basic concepts of SQL and data science were also tested.</p>
+
+    <p><strong>Round 6: HR Interview</strong><br/>
+    Covered personal introduction, office location preference, salary/package discussion, family background, hobbies, and overall feedback on the interview process.</p>
+
+    <p><strong>Result:</strong> Selected as Analyst at Merkle, Bengaluru.</p>
+
+    
+  </div>`,
+  "avaali": `<header>
+    <h1>📝 My Interview Experience at Avali Solutions Pvt. Ltd.</h1>
+    <p>📍 Campus Placement | DY Patil Institute of Technology, Pimpri</p>
+  </header>
+
+  <main style="padding: 2rem; line-height: 1.7;">
+    <p><strong>Avali Solutions Pvt. Ltd.</strong> from Bengaluru visited our college for campus placements. The selection process consisted of multiple rounds, and I was fortunate to be shortlisted for all of them.</p>
+
+    <h2>🧪 Step 1: Coding Assessment (Offline)</h2>
+    <p>The assessment was conducted in our college lab. It included:</p>
+    <ul>
+      <li>6 questions total</li>
+      <li><strong>2 SQL queries</strong></li>
+      <li><strong>4 programming problems</strong> (DSA-related)</li>
+    </ul>
+    <p>I cleared the assessment successfully and was selected for the next round – the technical interview.</p>
+
+    <h2>🛠️ Step 2: Technical Interview (Online)</h2>
+    <p>This round was held online through the college Training & Placement department. I was asked the following questions:</p>
+    <ul>
+      <li>Explanation of my project</li>
+      <li>One DSA question: <strong>Avogadro number problem</strong></li>
+      <li>Array question</li>
+      <li>String manipulation problem</li>
+      <li>Linked list operation</li>
+      <li>One puzzle: <strong>“Two Candle Puzzle”</strong> – I solved it within 5 minutes</li>
+    </ul>
+    <p>This was one of the most balanced and enjoyable interviews I had.</p>
+
+    <h2>💼 Step 3: HR Round</h2>
+    <p>The HR round was a bit different – focused more on general knowledge than technical or behavioral questions:</p>
+    <ul>
+      <li>What is GST?</li>
+      <li>What is CGST?</li>
+      <li>Who is the Prime Minister of India?</li>
+      <li>What is the capital of India?</li>
+      <li>What is the economic capital of India?</li>
+    </ul>
+    <p>I confidently answered all the questions.</p>
+
+    <h2>📉 Final Outcome</h2>
+    <p>Despite performing well in all rounds, my name was not in the final selection list. It was disappointing, but I still consider this one of the best interview experiences due to the quality of questions and interaction.</p>
+
+    <h2>💡 Takeaway</h2>
+    <p>This interview helped boost my confidence and sharpened my DSA and general knowledge preparation. Sometimes even good performances don’t lead to selection due to limited seats, but every interview adds valuable learning.</p>
+  </main>`,
+  "basics": `<h1>📝 Basic Most Asked Programming Questions</h1>
+
+  <div class="problem-list">
+    <ol>
+      <li>Welcome Text on Separate Line</li>
+      <li>Sum of Two Numbers</li>
+      <li>Size of Fundamental Data Types</li>
+      <li>Sum Using Variables</li>
+      <li>Limits of Integer Data Types</li>
+      <li>Check Primitive Value Limits</li>
+      <li>Mixed Data Types and Arithmetic</li>
+      <li>Overflow and Underflow in Arithmetic</li>
+      <li>Pre and Post Increment/Decrement</li>
+      <li>Output Formatting Example</li>
+      <li>Results of Specific Operations</li>
+      <li>Add Two Numbers from Keyboard</li>
+      <li>Swap Two Numbers</li>
+      <li>Volume of a Sphere</li>
+      <li>Volume of a Cube</li>
+      <li>Volume of a Cylinder</li>
+      <li>Area and Perimeter of Rectangle</li>
+      <li>Triangle Area Using Heron's Formula</li>
+      <li>Area and Circumference of Circle</li>
+      <li>Celsius to Fahrenheit Conversion</li>
+      <li>Fahrenheit to Celsius Conversion</li>
+      <li>Find Third Angle of Triangle</li>
+      <li>Kilometers to Miles Conversion</li>
+      <li>Kelvin to Fahrenheit Conversion</li>
+      <li>Kelvin to Celsius Conversion</li>
+      <li>Fahrenheit to Kelvin Conversion</li>
+      <li>Celsius to Kelvin Conversion</li>
+      <li>Scalene Triangle Area Calculation</li>
+      <li>Quotient and Remainder Calculation</li>
+      <li>Total and Average of Four Numbers</li>
+      <li>Rectangular Pattern of Single Digit</li>
+      <li>Check Number Sign (Positive, Negative, Zero)</li>
+      <li>Divide Two Numbers and Print Quotient</li>
+      <li>Current Date and Time Display</li>
+      <li>Compute Specified Expression</li>
+      <li>Test Type Casting in C++</li>
+      <li>Print Mystery Series 1 to 50</li>
+      <li>Multiplication Table for Input Number</li>
+      <li>Print Custom ASCII Pattern</li>
+      <li>Area and Perimeter of Rectangle</li>
+      <li>Print American Flag Pattern</li>
+      <li>Reverse First and Last Name</li>
+      <li>Circle Area and Circumference</li>
+      <li>Sphere Volume</li>
+      <li>Cone Volume</li>
+      <li>Cylinder Volume</li>
+      <li>Sum of Even and Odd Numbers</li>
+      <li>Swap Variables Without Temp</li>
+      <li>ASCII/Unicode of Character</li>
+      <li>Centimeters to Meters and Kilometers</li>
+      <li>Kilometers to Miles Conversion</li>
+      <li>Third Angle of Triangle</li>
+      <li>Equilateral Triangle Area</li>
+      <li>Simple Interest Calculation</li>
+      <li>Compound Interest Calculation</li>
+      <li>String Manipulation Examples</li>
+    </ol>
+  </div>`,
+  "bendre": `<header>
+    <h1>Anushka Bendre</h1>
+    <p>Interview Experience @ HCLTech</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>HCLTech - Software Developer</h2>
+
+    <p><strong>1. Assessment Test:</strong><br/>
+      An online test with aptitude, reasoning, English, and basic programming questions. Some roles include a coding round.
+    </p>
+
+    <p><strong>2. Group Discussion:</strong><br/>
+      A group of candidates discusses a topic. It checks your communication, confidence, and ability to work in a team.
+    </p>
+
+    <p><strong>3. Technical Interview 1:</strong><br/>
+      Covers programming basics, core subjects like DBMS, OOPs, OS, and your academic projects. You should be able to explain your code clearly.
+    </p>
+
+    <p><strong>4. Technical Interview 2:</strong><br/>
+      More detailed technical questions, real-time problem solving, and coding tasks. It tests how you apply your knowledge.
+    </p>
+
+    <p><strong>5. HR Interview 1:</strong><br/>
+      Questions about yourself, your goals, your interest in HCLTech, and your flexibility to relocate or work in shifts.
+    </p>
+
+    <p><strong>6. HR Interview 2:</strong><br/>
+      A final round if needed. It includes discussions about salary, job role, location, and clearing any remaining doubts.
+    </p>
+
+    <p><strong>Result:</strong> Selected at HCLTech</p>
+
+    <p>This experience was shared by <strong>Anushka Bendre</strong>, a friend of Rohan Sakhare.</p>
+
+    
+  </div>`,
+  "bhairvnath": `<header>
+    <h1>Bhairvnath Bhuse</h1>
+    <p>Interview Experience @ Capgemini</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>Capgemini - Computer Engineering</h2>
+
+    <p><strong>Round 1 - Online Aptitude Test (via CoCubes):</strong><br/>
+    This round included three sections:<br/><br/>
+    <strong>Technical Aptitude:</strong><br/>
+    - Pseudocode (15 questions)<br/>
+    - Algorithms (10 questions)<br/>
+    Covered basics of Trees, Graphs, Stacks, Queues, Linked Lists, loops, bitwise operations, etc.<br/>
+    <em>Note: This was an elimination round.</em><br/><br/>
+
+    <strong>English Aptitude:</strong><br/>
+    Simple questions on synonyms, antonyms, grammar, and comprehension.<br/>
+    <em>Note: Also elimination-based.</em><br/><br/>
+
+    <strong>Game-Based Assessment:</strong><br/>
+    A 27-minute game test with 4 parts:<br/>
+    - Deductive Thinking<br/>
+    - Inductive Thinking<br/>
+    - Grid Challenge (recall and sequence memory)<br/>
+    - Motion Challenge (push block to goal - I cleared 15 levels)<br/><br/>
+    Afterwards, a Behavioral Competency Test was conducted but didn't confirm progression.</p>
+
+    <p><strong>Round 2 - Coding Round:</strong><br/>
+    Based on the job role, I was not eligible for the coding round and was directly promoted to the technical round.</p>
+
+    <p><strong>Round 3 - Technical Interview (via Superset):</strong><br/>
+    The interviewer asked me about:<br/>
+    - Family background and academic journey<br/>
+    - My final year project<br/>
+    - Favorite technologies and preferred coding languages<br/>
+    - Why Capgemini and not higher studies<br/><br/>
+    Confidence and clarity were key to clearing this round. Most of us cleared this round.</p>
+
+    <p><strong>Round 4 - HR Interview:</strong><br/>
+    A casual and personality-based round. Questions included:<br/>
+    - Hobbies and ambitions<br/>
+    - Happiest moment of life<br/>
+    - A moment I was proud of<br/>
+    - Willingness to relocate<br/>
+    - Agreement on the 2-year service bond</p>
+
+    <p><strong>Tips:</strong><br/>
+    Be confident and curious. Use the interview opportunity to ask thoughtful questions to show interest.</p>
+
+    <p><strong>Result:</strong><br/>
+    <span style="color: #00e0ff; font-weight: bold;">Selected</span> at Capgemini.</p>
+
+    
+  </div>`,
+  "brainvire": `<header>
+    <h1>🚀 My Interview Experience at Brainvire Inc – iOS Developer Intern Role</h1>
+    <p>Off-Campus | Final Year Computer Engineering | Internship Interview Experience</p>
+  </header>
+
+  <main style="padding: 2rem; line-height: 1.7;">
+    <p>I recently had the opportunity to interview with <strong>Brainvire Inc</strong> for an <strong>iOS Developer Intern</strong> position. Here's my experience — sharing this to help fellow iOS aspirants!</p>
+
+    <h2>🧪 Interview Rounds & Topics</h2>
+    <p>The interview covered a mix of technical, iOS-specific, and basic programming concepts. Here’s the breakdown of topics asked based on the syllabus I prepared with:</p>
+
+    <h3>1️⃣ Object-Oriented Programming (OOP) Concepts</h3>
+    <ul>
+      <li>Classes and Objects</li>
+      <li>Inheritance</li>
+      <li>Encapsulation, Abstraction & Polymorphism</li>
+      <li>Protocols in Swift</li>
+      <li>Difference between class, struct, and enum</li>
+    </ul>
+
+    <h3>2️⃣ iOS Basic Awareness</h3>
+    <ul>
+      <li>iOS ecosystem and Xcode basics</li>
+      <li>Storyboard vs. Programmatic UI</li>
+      <li>UIKit vs. SwiftUI</li>
+      <li>MVC vs. MVVM architectures</li>
+      <li>View Lifecycle (e.g., ViewDidLoad, ViewWillAppear)</li>
+      <li>Auto Layout and constraints</li>
+    </ul>
+
+    <h3>3️⃣ Databases</h3>
+    <ul>
+      <li>Introduction to Core Data & CRUD operations</li>
+      <li>Basics of SQLite</li>
+      <li>Using UserDefaults</li>
+      <li>Difference: Core Data vs. Realm</li>
+    </ul>
+
+    <h3>4️⃣ Conditional Statements & Swift Basics</h3>
+    <ul>
+      <li>If-else and switch-case logic</li>
+      <li>Ternary operators</li>
+      <li>Optional binding using <code>if let</code> & <code>guard let</code></li>
+    </ul>
+
+    <h3>5️⃣ Logical & Aptitude Questions (Asked in Coding Round)</h3>
+    <ul>
+      <li>Pattern printing</li>
+      <li>Reversing strings and numbers</li>
+      <li>Swapping numbers without a third variable</li>
+      <li>FizzBuzz</li>
+      <li>Prime number check & Fibonacci series</li>
+      <li>Palindrome check</li>
+    </ul>
+
+    <h2>📌 Final Thoughts</h2>
+    <p>The Brainvire interview process was straightforward but tested **conceptual clarity and practical coding ability**. The panel focused on <strong>Swift fundamentals, logic building, architecture knowledge, and project discussion</strong>.</p>
+
+    <p>✨ Takeaway: Stay consistent, revise basics regularly, and always be ready to explain your projects and decisions. This interview was a strong step forward in my iOS career journey!</p>
+
+    <p>Wishing the best to all iOS aspirants out there — <strong>keep learning and coding!</strong> 📱💻</p>
+  </main>`,
+  "capsitech": `<header>
+    <h1>💻 My Interview Experience at Capsitech – Full Stack Developer Role</h1>
+    <p>📍 Campus Placement | Rajasthan-Based Company | Online + Interview Rounds</p>
+  </header>
+
+  <main style="padding: 2rem; line-height: 1.7;">
+    <p>Capsitech, a company based in Rajasthan, visited our college for campus placements. They were hiring for two roles: <strong>AI/ML Engineer</strong> and <strong>Full Stack Developer</strong>. I applied for the Full Stack Developer position.</p>
+
+    <h2>🧪 Step 1: Online Assessment</h2>
+    <p>The first step was an online assessment. I cleared the test and was shortlisted for the interview round.</p>
+
+    <h2>🗣️ Technical Interview</h2>
+    <p>In the interview, the panel asked me several questions covering web technologies, databases, and my project work:</p>
+    <ul>
+      <li>HTML, CSS, and JavaScript basics</li>
+      <li>Difference between <code>var</code> and <code>let</code></li>
+      <li>What is Full Stack Development?</li>
+      <li>What is the MERN stack?</li>
+      <li>What is Figma and how is it used in UI design?</li>
+      <li>MySQL basics: What is DDL, DML, TRUNCATE, DELETE, CURSOR, etc.</li>
+    </ul>
+
+    <h2>📱 Project-Based Questions</h2>
+    <p>The interviewer also asked about my project in detail:</p>
+    <ul>
+      <li>Which technologies did you use?</li>
+      <li>Why did you choose these technologies?</li>
+      <li>What are the use cases of your project?</li>
+    </ul>
+
+    <h2>🎯 Conclusion</h2>
+    <p>The interview was very interactive and focused on both technical understanding and real-world project application. This experience helped me reinforce the importance of clarity in basic web and database concepts, along with confidence in explaining my own work.</p>
+  </main>`,
+  "chakradhar": `<header>
+    <h1>Chakradhar Malage</h1>
+    <p>Interview Experience @ Capgemini</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>Capgemini - Software Role</h2>
+
+    <p><strong>Round 1: Resume Shortlisting</strong><br/>
+    The initial shortlisting was based on the resume, including skills, projects, and academic performance.</p>
+
+    <p><strong>Round 2: Coding Assessment</strong><br/>
+    This round had 3 coding questions focused on linear data structures such as arrays, stacks, and queues. Language choice was flexible.</p>
+
+    <p><strong>Round 3: Multiple Subtests</strong><br/>
+    Candidates who cleared the coding round appeared for a comprehensive online test consisting of:
+    <ul>
+      <li>Aptitude questions</li>
+      <li>English writing skills assessment</li>
+      <li>Technical MCQs</li>
+    </ul>
+    </p>
+
+    <p><strong>Round 4: Communication Round</strong><br/>
+    This round evaluated English fluency, confidence, and clarity of expression through verbal tasks and general conversation.</p>
+
+    <p><strong>Round 5 & 6: Interviews</strong><br/>
+    Chakradhar faced two interview rounds where he was assessed on technical knowledge, problem-solving skills, and behavioral traits.</p>
+
+    <p><strong>Result:</strong> Selected at Capgemini</p>
+
+    
+  </div>`,
+  "cn": `<h1>🌐 Top 100 Computer Network Interview Questions</h1>
+
+  <div class="question-list">
+    <ol>
+      <li>What is a Computer Network?</li>
+      <li>What are the different types of networks?</li>
+      <li>Explain LAN, MAN, and WAN.</li>
+      <li>What is a Protocol?</li>
+      <li>What is the OSI Model?</li>
+      <li>List the layers of the OSI Model.</li>
+      <li>What is the function of each OSI layer?</li>
+      <li>What is TCP/IP?</li>
+      <li>Compare OSI and TCP/IP models.</li>
+      <li>What is the function of the Network Layer?</li>
+      <li>What is IP addressing?</li>
+      <li>Differentiate between IPv4 and IPv6.</li>
+      <li>What is a subnet and why is it used?</li>
+      <li>What is a MAC address?</li>
+      <li>What is ARP (Address Resolution Protocol)?</li>
+      <li>What is DNS and how does it work?</li>
+      <li>What is a Router?</li>
+      <li>What is a Switch?</li>
+      <li>What is a Hub?</li>
+      <li>What is the difference between Hub and Switch?</li>
+      <li>What is NAT (Network Address Translation)?</li>
+      <li>What is DHCP and how does it work?</li>
+      <li>What is the function of a Gateway?</li>
+      <li>What is a Firewall?</li>
+      <li>Explain the concept of Port numbers.</li>
+      <li>What is a Socket?</li>
+      <li>What is bandwidth?</li>
+      <li>What is throughput?</li>
+      <li>What is latency?</li>
+      <li>What is jitter?</li>
+      <li>What is packet switching?</li>
+      <li>What is circuit switching?</li>
+      <li>What is the difference between TCP and UDP?</li>
+      <li>What are common TCP/IP protocols?</li>
+      <li>What is SSL/TLS?</li>
+      <li>What is a VPN?</li>
+      <li>What is an IP packet?</li>
+      <li>Explain ICMP and its purpose.</li>
+      <li>What is a Broadcast Domain?</li>
+      <li>What is a Collision Domain?</li>
+      <li>What is HTTP and HTTPS?</li>
+      <li>What is FTP?</li>
+      <li>What is SSH?</li>
+      <li>What is Telnet?</li>
+      <li>What are the differences between SSH and Telnet?</li>
+      <li>What is CSMA/CD?</li>
+      <li>What is CSMA/CA?</li>
+      <li>What is an Access Point?</li>
+      <li>What is a VLAN?</li>
+      <li>What is a proxy server?</li>
+      <li>Explain traceroute and its purpose.</li>
+      <li>What is the three-way handshake in TCP?</li>
+      <li>What is congestion control in TCP?</li>
+      <li>What is flow control?</li>
+      <li>What is fragmentation in networking?</li>
+      <li>What is QoS (Quality of Service)?</li>
+      <li>What is a loopback address?</li>
+      <li>What is DNS Spoofing?</li>
+      <li>What is IP Spoofing?</li>
+      <li>What is Network Topology?</li>
+      <li>Explain bus, ring, star, mesh topology.</li>
+      <li>What is a packet sniffer?</li>
+      <li>What is a Tunneling Protocol?</li>
+      <li>What is port forwarding?</li>
+      <li>What is network security?</li>
+      <li>What is a man-in-the-middle attack?</li>
+      <li>What is a denial-of-service (DoS) attack?</li>
+      <li>What is wireless networking?</li>
+      <li>What are 2.4 GHz and 5 GHz Wi-Fi bands?</li>
+      <li>What is WPA, WPA2, and WPA3?</li>
+      <li>What is WEP?</li>
+      <li>What is network redundancy?</li>
+      <li>What is BGP?</li>
+      <li>What is OSPF?</li>
+      <li>What is RIP?</li>
+      <li>What is a public IP vs private IP?</li>
+      <li>What is multicast?</li>
+      <li>What is anycast?</li>
+      <li>What is unicast?</li>
+      <li>What is a demilitarized zone (DMZ)?</li>
+      <li>What is a beacon frame?</li>
+      <li>What is link-state routing?</li>
+      <li>What is distance-vector routing?</li>
+      <li>What is time-to-live (TTL)?</li>
+      <li>What is PPP protocol?</li>
+      <li>What is Ethernet?</li>
+      <li>What is MPLS?</li>
+      <li>What is IS-IS routing protocol?</li>
+      <li>What is an IPv6 header?</li>
+      <li>What is port scanning?</li>
+      <li>What is a NAT table?</li>
+      <li>What is an edge router?</li>
+      <li>What is Zero Trust Networking?</li>
+      <li>What is IDS and IPS?</li>
+      <li>What is SDN (Software Defined Networking)?</li>
+      <li>What is network virtualization?</li>
+      <li>What are wireless mesh networks?</li>
+      <li>What is LTE?</li>
+      <li>What is 5G?</li>
+      <li>What are different types of routing algorithms?</li>
+      <li>What is subnetting?</li>
+      <li>What is supernetting?</li>
+      <li>What is ICANN?</li>
+      <li>What is IANA?</li>
+      <li>What is the function of a modem?</li>
+    </ol>
+  </div>`,
+  "cognizant": `<header>
+    <h1>🚀 My Interview Experience at Cognizant – Campus Placement</h1>
+    <p>On-Campus | Final Year Computer Engineering | Cognizant Software Role</p>
+  </header>
+
+  <main style="padding: 2rem; line-height: 1.7;">
+    <p><strong>Cognizant</strong> visited our college for campus placements, and I was excited to participate in the process. Here's my experience through each stage of the selection:</p>
+
+    <h2>1️⃣ Screening Round</h2>
+    <p>I cleared the initial **screening round**, which was used to shortlist candidates based on academic records and eligibility.</p>
+
+    <h2>2️⃣ Communication Round</h2>
+    <p>This round was focused on testing English comprehension, grammar, and communication fluency. I cleared this round successfully.</p>
+
+    <h2>3️⃣ Online Assessment</h2>
+    <p>The assessment round was quite comprehensive and included:</p>
+    <ul>
+      <li>✅ 2 Coding Problems</li>
+      <li>✅ 2 MySQL Queries</li>
+      <li>✅ 1 Frontend Task using <strong>HTML, CSS, and JavaScript</strong></li>
+    </ul>
+    <p>I was able to solve almost 90% of this round, which helped me get shortlisted for the interview.</p>
+
+    <h2>4️⃣ Technical + HR Interview</h2>
+    <p>The interview panel asked me about my preferred programming language. They gave me the choice between <strong>Java</strong> and <strong>Python</strong>, but I confidently told them that I specialize in <strong>C++</strong>.</p>
+
+    <p>They asked me questions from both **Java** and **C++**, covering topics like:</p>
+    <ul>
+      <li>✅ OOPS Concepts – Inheritance, Polymorphism, Overloading & Overriding</li>
+      <li>✅ Differences between Class, Object, and Struct</li>
+      <li>✅ Code writing for Arrays and Strings</li>
+      <li>✅ Basic and intermediate <strong>DSA</strong> problems</li>
+      <li>✅ SQL – I confidently answered all questions and scored a perfect 100/100</li>
+    </ul>
+
+    <h2>🚫 Outcome</h2>
+    <p>Although I did well in MySQL and general programming, I couldn’t answer some Java-based and DSA questions due to less familiarity. Since the company required strength in Java, I wasn’t selected in the final round.</p>
+
+    <h2>💡 Takeaway</h2>
+    <p>This experience taught me how crucial it is to be flexible with programming languages in company-specific scenarios. While I was confident in C++, the interviewers expected some level of Java proficiency.</p>
+
+    <p><strong>Advice:</strong> If you're preparing for product-based or service-based companies like Cognizant, make sure to:</p>
+    <ul>
+      <li>📘 Know OOPS deeply (across multiple languages)</li>
+      <li>📚 Practice DSA and SQL consistently</li>
+      <li>🧠 Be ready for frontend and backend assessments</li>
+    </ul>
+
+    <p>Though I didn’t get selected, this interview experience boosted my confidence and clarified where I need to improve. 🚀</p>
+  </main>`,
+  "devdatt": `<header>
+    <h1>Devdatt Khilare</h1>
+    <p>Interview Experience @ Mindsprint (SAP Developer)</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>Mindsprint - SAP Developer Role</h2>
+
+    <p><strong>Round - Technical + Role Fit Interview:</strong><br/>
+    The interview started with a personal introduction. After that, I was asked about the projects listed in my resume. I had to choose one project and explain its complete timeline — from how the idea originated to its deployment and the social impact it created.</p>
+
+    <p>Then the interviewer asked me about the role I will be assigned after joining Mindsprint. He wanted to know if I had any prior knowledge of the SAP Developer role and how I would fit into it. I explained how my background and interests align with the position.</p>
+
+    <p>Later, I was given a scenario where I had to interact with a client regarding a project. The interviewer asked how I would manage communication and handle the client professionally. I answered with a structured approach to ensure clarity, timely updates, and requirement understanding.</p>
+
+    <p>Finally, I was given a chance to ask questions. I asked one insightful question to the interviewer, which was well received. The interview concluded on a positive note.</p>
+
+    <p><strong>Result:</strong><br/>
+    <span style="color: #00e0ff; font-weight: bold;">Selected</span> as SAP Developer at Mindsprint through college placement.</p>
+
+    
+  </div>`,
+  "etisha": `<header>
+    <h1>Etisha Pednekar</h1>
+    <p>Interview Experience @ Cognizant</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>Cognizant - Software Developer</h2>
+
+    <p><strong>Assessment 1:</strong><br/>
+    The first assessment included three sections:
+    <ul>
+      <li>MCQs on general aptitude and technical concepts</li>
+      <li>SQL queries</li>
+      <li>Web design-based question</li>
+    </ul>
+    </p>
+
+    <p><strong>Assessment 2 (90 mins):</strong><br/>
+    Comprised of six sections:
+    <ul>
+      <li><strong>Section 1:</strong> C# coding question</li>
+      <li><strong>Sections 2-5:</strong> MCQs on OOPs, ADO.NET, ASP.NET, ASP.NET Web API</li>
+      <li><strong>Section 6:</strong> SQL Server-related questions</li>
+    </ul>
+    </p>
+
+    <p><strong>Interview:</strong><br/>
+    <ul>
+      <li>Code to compress a string</li>
+      <li>Code to reverse a stack (in C#)</li>
+      <li>Questions based on skills and projects from the resume</li>
+    </ul>
+    </p>
+
+    <p><strong>Result:</strong> Selected at Cognizant</p>
+
+    <p>This experience was shared by <strong>Etisha Pednekar</strong>, a friend of Rohan Sakhare.</p>
+
+    
+  </div>`,
+  "euronet": `<header>
+    <h1>Euronet Interview Experience</h1>
+    <p>Jr. Software Engineer at Euronet Worldwide, Inc. | Interviewed Feb 2025 in Mumbai</p>
+  </header>
+
+  <main style="padding: 2rem; line-height: 1.7;">
+    <h2>📌 On-Campus Interview Process</h2>
+
+    <h3>1. Online Test (via HirePro)</h3>
+    <ul>
+      <li>Aptitude</li>
+      <li>Coding MCQs</li>
+      <li>Technical MCQs</li>
+      <li><strong>Difficulty:</strong> Moderate</li>
+    </ul>
+
+    <h3>2. Technical Interview</h3>
+    <ul>
+      <li>Introduced myself, discussed iOS projects.</li>
+      <li><strong>DBMS:</strong> SQL queries — JOINs, nested queries.</li>
+      <li><strong>OOP:</strong> Explained 4 pillars with code (Inheritance, Polymorphism, Encapsulation, Abstraction).</li>
+      <li><strong>Pointers:</strong> C/C++ pointer arithmetic & memory concepts.</li>
+      <li><strong>DSA:</strong> Pattern problems, array logic questions.</li>
+      <li><strong>Sorting:</strong> Time complexities (Bubble, Merge, Quick).</li>
+      <li><strong>Project:</strong> Explained problem, implementation, challenges, and future scope.</li>
+      <li><strong>HR-style Question:</strong> "What do you expect from freshers?"<br/>
+        ↳ <em>Strong fundamentals, learning mindset, and good communication skills.</em></li>
+    </ul>
+
+    <h3>3. Results</h3>
+    <ul>
+      <li>Interview held: <strong>January 2025</strong></li>
+      <li>Results declared: <strong>May 2025</strong></li>
+      <li><strong>Selected: 4 students</strong> — I was the top-ranked.</li>
+    </ul>
+
+    <h3>🌟 Tips</h3>
+    <ul>
+      <li>Practice Aptitude, DSA regularly.</li>
+      <li>Revise core subjects: DBMS, OOP, Basics.</li>
+      <li>Explain your projects confidently with clarity.</li>
+      <li>Use platforms like <strong>GFG</strong>, <strong>LeetCode</strong>, and <strong>InterviewBit</strong>.</li>
+    </ul>
+
+    <p style="margin-top: 2rem; font-style: italic;">✨ A memorable journey. Stay focused and believe in yourself!</p>
+  </main>`,
+  "frnd": `<header>
+    <h1>🚀 My Interview Experience at FRND – iOS Developer Intern Role</h1>
+    <p>Off-Campus | Second Interview Attempt | Final Year Computer Engineering Student</p>
+  </header>
+
+  <main style="padding: 2rem; line-height: 1.7;">
+    <p>Recently, I had the opportunity to interview at <strong>FRND</strong> for an iOS Developer Intern role. This was my second interview after facing rejection from Jar, and it turned out to be a valuable learning experience that emphasized the importance of consistent practice and deep exploration of iOS technologies.</p>
+
+    <h2>📋 Interview Experience</h2>
+    <p>The interview was relatively easy and focused on fundamental iOS concepts. Topics covered:</p>
+    <ul>
+      <li>✅ Swift concepts</li>
+      <li>✅ MVVM architecture</li>
+      <li>✅ State & Binding in SwiftUI</li>
+      <li>✅ CoreData</li>
+      <li>✅ My previous iOS internship project</li>
+    </ul>
+    <p>⚠️ However, due to limited advanced practice, I felt I could’ve done better.</p>
+
+    <h2>🎯 Key Takeaway</h2>
+    <p>At the end of the interview, I asked the interviewer:</p>
+    <blockquote>
+      <strong>💡 "What are the essential skills for an iOS Developer Intern or Fresher?"</strong>
+    </blockquote>
+    <p>Their advice was simple yet powerful:</p>
+    <ul>
+      <li>🔹 Maintain consistency in coding</li>
+      <li>🔹 Practice daily on <strong>Xcode Playground</strong></li>
+      <li>🔹 Learn a new concept every day and <strong>implement</strong> it</li>
+    </ul>
+
+    <p>This experience reinforced the value of <strong>continuous learning</strong>. Although I didn’t secure the offer, I gained insights that will shape my preparation going forward.</p>
+
+    <p>💡💻 If you're preparing for iOS roles, remember: <strong>Consistency is key.</strong> Let's grow together!</p>
+  </main>`,
+  "gauri": `<header>
+    <h1>Gauri Marwadkar</h1>
+    <p>Interview Experience @ Microland</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>Microland - Interview Experience</h2>
+
+    <p><strong>Round 1 - Online Aptitude Test (30 mins):</strong><br/>
+    Consisted of 30 questions. Covered Verbal Ability, Logical Reasoning, and Quantitative Aptitude. Time management was crucial due to limited time for all three sections.</p>
+
+    <p><strong>Round 2 - Core Language Test (40 mins):</strong><br/>
+    Focused mainly on English grammar and language comprehension. Included questions on tenses, prepositions, sentence correction, vocabulary, and reading comprehension.</p>
+
+    <p><strong>Round 3 - Speaking/Communication Test (40 mins):</strong><br/>
+    Assessed spoken English fluency, pronunciation, and confidence. Included tasks like reading passages aloud, answering general questions, or speaking on a topic for a minute.</p>
+
+    <p><strong>Round 4 - Technical Interview:</strong><br/>
+    Involved core subject knowledge, programming fundamentals, and project discussion. Topics included Java, OOPs, DBMS, or relevant domain knowledge based on the resume.</p>
+
+    <p><strong>Round 5 - HR Interview (20 mins):</strong><br/>
+    Focused on personality assessment, communication skills, and cultural fit. Questions covered strengths, weaknesses, career goals, and relocation or salary expectations.</p>
+
+    <p><strong>Result:</strong><br/>
+    <span style="color: #00e0ff; font-weight: bold;">Selected</span> at Microland.</p>
+
+    
+  </div>`,
+  "google": `<header>
+    <h1>Google Interview Experience</h1>
+  </header>
+  <main style="padding: 2rem;">
+    <p><strong>Round 1:</strong> Online Coding Round (DSA + Aptitude)</p>
+    <p><strong>Round 2:</strong> Technical Interview (OOP + System Design)</p>
+    <p><strong>Round 3:</strong> HR Interview</p>
+    <p>💡 Tip: Practice LeetCode, communicate clearly, and stay confident!</p>
+  </main>`,
+  "jar": `<header>
+    <h1>🚀 My Interview Experience with Jar (iOS Internship)</h1>
+    <p>Off-Campus | Final Year Computer Engineering Student | iOS Developer Intern</p>
+  </header>
+
+  <main style="padding: 2rem; line-height: 1.7;">
+    <h2>1️⃣ Application Process</h2>
+    <p>I applied off-campus, and after my resume was shortlisted, I received a phone call from HR to discuss my application.</p>
+
+    <h2>2️⃣ Live Coding Round (Online)</h2>
+    <p>This round was conducted online. I was given a buggy code and had to:</p>
+    <ul>
+      <li>Debug the code</li>
+      <li>Fix all issues</li>
+      <li>Push the corrected version to GitHub</li>
+      <li>Submit within <strong>1 hour 30 minutes</strong></li>
+    </ul>
+    <p>✅ I successfully cleared this round!</p>
+
+    <h2>3️⃣ Technical Interview</h2>
+    <p>I received a call from HR two hours later informing me that I was selected for the technical round. The interview was challenging and covered:</p>
+    <ul>
+      <li>✅ Swift Basics</li>
+      <li>✅ MVVM Architecture</li>
+      <li>✅ OOP Concepts</li>
+      <li>✅ Stacks & Data Structures</li>
+      <li>✅ Difference between <strong>Class & Struct</strong></li>
+      <li>✅ Friend Functions</li>
+      <li>✅ Nil & Optional Values</li>
+      <li>✅ My iOS Projects</li>
+      <li>✅ API Integration & Firebase</li>
+      <li>✅ <strong>SwiftUI</strong> (major focus!)</li>
+      <li>✅ Extensions in Swift</li>
+    </ul>
+    <p>❌ I couldn’t answer a few questions confidently, which led to my rejection in this round.</p>
+
+    <h2>4️⃣ Final HR Round (Not Qualified)</h2>
+    <p>Since I didn’t clear the technical round, I wasn’t eligible for the HR round. However:</p>
+    <ul>
+      <li>💡 I was among only <strong>5 candidates</strong> who cleared the live coding round.</li>
+      <li>🧑‍🎓 All others were graduates — I’m still in my final year!</li>
+    </ul>
+
+    <h2>💡 Takeaways</h2>
+    <p>This was a fantastic learning experience for me. Although I didn’t make it to the final round, I gained:</p>
+    <ul>
+      <li>🎯 Confidence in my Swift & SwiftUI skills</li>
+      <li>📈 Motivation to keep learning and improving</li>
+    </ul>
+    <p>To all aspiring iOS developers: <strong>Keep learning, keep coding, and never be afraid of challenges!</strong> 🚀</p>
+  </main>`,
+  "linkedlist": `<h1>🔗 Most Asked Linked List Interview Problems</h1>
+
+  <div class="problem-list">
+    <ol>
+      <li>Reverse a Linked List</li>
+      <li>Detect Loop in Linked List</li>
+      <li>Find Length of Linked List</li>
+      <li>Find Middle of Linked List</li>
+      <li>Remove Duplicates from Sorted List</li>
+      <li>Remove Duplicates from Unsorted List</li>
+      <li>Check if Linked List is Palindrome</li>
+      <li>Merge Two Sorted Linked Lists</li>
+      <li>Find Intersection Point of Two Linked Lists</li>
+      <li>Detect and Remove Loop</li>
+      <li>Delete a Node Without Head Pointer</li>
+      <li>Segregate Even and Odd Nodes</li>
+      <li>Pairwise Swap Nodes</li>
+      <li>Add Two Numbers Represented by Linked Lists</li>
+      <li>Flatten a Multilevel Linked List</li>
+      <li>Rotate Linked List by K Nodes</li>
+      <li>Clone a Linked List with Random Pointers</li>
+      <li>Remove N-th Node from End</li>
+      <li>Delete All Occurrences of a Given Key</li>
+      <li>Check If Two Linked Lists Are Identical</li>
+      <li>Sort Linked List Using Merge Sort</li>
+      <li>Swap Kth Node from Start with Kth from End</li>
+      <li>Delete Middle Node of Linked List</li>
+      <li>Check for Circular Linked List</li>
+      <li>Convert Binary Number in LL to Integer</li>
+      <li>Intersection Node in Y Shaped LL</li>
+      <li>Delete Nodes Having Greater Value on Right</li>
+      <li>Odd Even Position Linked List</li>
+      <li>Rearrange in Zig-Zag Fashion</li>
+      <li>Check Length is Even or Odd</li>
+    </ol>
+  </div>`,
+  "mahesh": `<header>
+    <h1>Mahesh Raut</h1>
+    <p>Interview & Internship Experience @ ConnectWise LLP</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>ConnectWise LLP - Internship to Full-Time Journey</h2>
+
+    <p><strong>Internship Duration:</strong> 2 Months (May – July 2024, On-site, Pune)</p>
+    <p><strong>Final Result:</strong><br/>
+    ✅ Selected for Internship<br/>
+    ✅ Received PPO (Pre-Placement Offer)<br/>
+    ✅ Joined as Software Engineer I on <strong>3rd June 2025</strong>
+    </p>
+
+    <h3>Interview Rounds Overview</h3>
+
+    <p><strong>Round 1: Resume Shortlisting & Screening</strong></p>
+    <ul>
+      <li>CGPA Criteria: Above 8.5</li>
+      <li>Skills: Full Stack Development, DSA</li>
+      <li>HR Screening Call with basic questions</li>
+    </ul>
+
+    <p><strong>Round 2: Online DSA Coding Test</strong></p>
+    <ul>
+      <li>Platform: GeeksforGeeks</li>
+      <li>3 DSA Problems (2 Medium, 1 Hard)</li>
+      <li>Cleared: Solved 2 fully + passed test cases in 3rd</li>
+    </ul>
+
+    <p><strong>Round 3: Technical Interview (1 hr 15 min)</strong></p>
+    <ul>
+      <li><strong>OS:</strong> Kernel, types of OS, deadlocks</li>
+      <li><strong>CN:</strong> Protocols, IPv4/IPv6, tunneling</li>
+      <li><strong>DBMS:</strong> Queries, Normalization, Transactions</li>
+      <li><strong>Frontend:</strong> React + CSS Flexbox/Grid component</li>
+      <li><strong>DSA:</strong> Medium 2D Matrix problem (solved)</li>
+    </ul>
+
+    <p><strong>Round 4: Managerial Interview (1 hr)</strong></p>
+    <ul>
+      <li><strong>Backend:</strong> API methods (GET, POST, etc.), Express.js + DB</li>
+      <li><strong>React:</strong> Components, hooks, lifecycle</li>
+      <li><strong>OOP:</strong> 4 pillars, overloading vs overriding</li>
+      <li><strong>DSA:</strong> Array-based question (solved)</li>
+      <li><strong>Behavioral:</strong> Decision-making, leadership</li>
+    </ul>
+
+    <p><strong>Round 5: HR Interview (~20 mins)</strong></p>
+    <ul>
+      <li>Family Background</li>
+      <li>Career goals and 5-year plan</li>
+      <li>Availability and expectations</li>
+    </ul>
+
+    <h3>Timeline Summary</h3>
+    <ul>
+      <li>12 Mar 2024 – Internship Offer</li>
+      <li>20 Mar 2024 – Offer Letter & Joining</li>
+      <li>27 May 2024 – Internship started</li>
+      <li>6 Aug 2024 – PPO received</li>
+      <li>20 Aug 2024 – Full-Time Offer Letter</li>
+      <li>3 Jun 2025 – Joined as Software Engineer I</li>
+    </ul>
+
+    <p>This experience was shared by <strong>Mahesh Raut</strong> from Computer Engineering.</p>
+
+    
+  </div>`,
+  "mansi": `<header>
+    <h1>Maansi Sonawane</h1>
+    <p>Interview Experience @ Ultimate Kronos Group (UKG)</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>Ultimate Kronos Group (UKG) - Software Developer</h2>
+
+    <p><strong>Round 1: Technical and Aptitude Test</strong><br/>
+    This round included approximately 50–70 multiple-choice questions (MCQs), covering both technical and aptitude topics.
+    <ul>
+      <li>Technical questions focused on data analysis concepts</li>
+      <li>Aptitude section included logical reasoning and quantitative problems</li>
+    </ul>
+    </p>
+
+    <p><strong>Round 2: Technical Interview</strong><br/>
+    Started with a discussion on my resume projects, followed by questions on core academic subjects. I was also asked to solve and run the following problems:
+    <ul>
+      <li>Determine whether a given year is a leap year</li>
+      <li>Find the largest number in an array without using any predefined function</li>
+    </ul>
+    Additional aptitude questions included:
+    <ul>
+      <li><strong>Water Jug Problem:</strong> Measure exactly 4 liters using 5L and 3L jugs</li>
+      <li><strong>Clock Angle Problem:</strong> Find angle at 3:40 (Correct answer: 130°, not 150°)</li>
+    </ul>
+    </p>
+
+    <p><strong>Round 3: HR Interview</strong><br/>
+    The interview included:
+    <ul>
+      <li>Questions related to my projects</li>
+      <li>General/personal questions like:
+        <ul>
+          <li>What are your hobbies and interests?</li>
+          <li>What is your favorite subject and why?</li>
+          <li>Where do you see yourself in 5 years?</li>
+          <li>What are your career goals?</li>
+        </ul>
+      </li>
+    </ul>
+    The conversation was smooth and helped me showcase my personality.
+    </p>
+
+    <p><strong>Result:</strong> Selected at UKG</p>
+
+    
+  </div>`,
+  "meet": `<header>
+    <h1>Tushar Gosavi</h1>
+    <p>Interview Experience @ Cognizant</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>Cognizant - Interview Process</h2>
+
+    <p><strong>Round 1 - Communication Assessment:</strong></p>
+    <ul>
+      <li>30-40 questions across 7 sections</li>
+      <li>Topics included basic grammar, paragraph-based questions, spotting errors, and correcting sentences</li>
+      <li>1-minute spoken opinion on a given topic</li>
+    </ul>
+
+    <p><strong>Round 2 - Aptitude Test:</strong></p>
+    <ul>
+      <li>Questions on percentage, ratio & proportion, profit & loss</li>
+      <li>Game-based aptitude and analytical reasoning</li>
+      <li><strong>Note:</strong> Strong aptitude skills are important to clear this round</li>
+    </ul>
+
+    <p><strong>Selection Criteria:</strong><br/>
+    Shortlisting for the next round was based on combined results of Round 1 and 2.</p>
+
+    <p><strong>Round 3 - Technical Assessment:</strong></p>
+    <ul>
+      <li><strong>SQL:</strong> 2 questions focused on Joins and related concepts</li>
+      <li><strong>Java:</strong> 2 questions including one on Collections</li>
+      <li><strong>HTML/CSS/JS:</strong> Code was partially given, task was to complete it – for example, show profile image and name on click</li>
+    </ul>
+
+    <p><strong>Round 4 - Interview:</strong></p>
+    <ul>
+      <li>Conducted on-campus, students joined virtually from their laptops</li>
+      <li>Topics covered: Self-introduction, resume and project-based questions, certificate discussion</li>
+      <li><strong>Technical Questions:</strong> OOPs with real-life examples, DBMS concepts, SQL vs NoSQL, Java coding (patterns, toggle string, bubble sort, selection sort)</li>
+    </ul>
+
+    <p style="color: #00ff88;"><strong>🎉 Result: Selected</strong></p>
+
+    <p>This experience was shared by <strong>Tushar Gosavi</strong>, a friend of Rohan Sakhare.</p>
+
+    
+  </div>`,
+  "microland": `<header>
+    <h1>🧩 My Interview Experience at Microland – Non-Technical Role</h1>
+    <p>📍 Campus Placement | Online Process | Communication Test & Interview</p>
+  </header>
+
+  <main style="padding: 2rem; line-height: 1.7;">
+    <p>Microland visited our campus for placements, offering a <strong>non-technical role</strong>. The selection process consisted of multiple steps.</p>
+
+    <h2>🧪 Step 1: Online Assessment</h2>
+    <p>The first round was an online assessment conducted by the company. After clearing this, I moved on to the next stage.</p>
+
+    <h2>📱 Step 2: Mobile App-Based Communication Test</h2>
+    <p>Candidates were required to download a mobile application where they completed <strong>three communication-based tests</strong>. Each test was scored out of 600 marks, and it was compulsory to score above 450 to qualify for the final round. I successfully cleared this stage.</p>
+
+    <h2>🗣️ Final Interview</h2>
+    <p>The final interview was focused on assessing our suitability for the role. The interviewer informed me that the offered role was <strong>completely non-technical</strong>. They asked:</p>
+    <blockquote>
+      “The role is non-technical. Are you comfortable with that?”
+    </blockquote>
+    <p>I responded honestly, saying that my interest lies in <strong>technical and coding roles</strong>, and hence I would prefer to pursue opportunities aligned with my goals.</p>
+
+    <h2>🎯 Conclusion</h2>
+    <p>This experience helped me understand the importance of aligning opportunities with career goals. Even though I was not selected, I stayed true to my passion for coding and software development.</p>
+  </main>`,
+  "mindsprint": `<header>
+    <h1>💼 My Interview Experience at MindSprint – Junior Consultant (SAP Developer)</h1>
+    <p>📍 Campus Placement | Role Location: Chennai / Bangalore</p>
+  </header>
+
+  <main style="padding: 2rem; line-height: 1.7;">
+    <p><strong>MindSprint</strong> visited our college for campus placement for the role of <strong>Junior Consultant (Technical)</strong>, specifically for the SAP Developer position — one of the most promising roles offered.</p>
+
+    <h2>📝 Round 1: Online Assessment</h2>
+    <p>The assessment was conducted on the <strong>HirePro platform</strong>. I cleared the assessment and was shortlisted for the interview round.</p>
+
+    <h2>💻 Round 2: Interview (In-Person at College)</h2>
+    <p>The interview included both <strong>HR and technical questions</strong>. It started with personal introduction and background:</p>
+
+    <ul>
+      <li>👋 HR questions: "How are you, Rohan?", "Tell me about your background."</li>
+      <li>💡 Technical questions: OOP concepts and MySQL queries</li>
+      <li>📱 Project discussion: I explained my <strong>College Champion Mobile App</strong> and my <strong>Portfolio Website</strong></li>
+    </ul>
+
+    <p>The interviewer asked me to <strong>type the URL of my portfolio</strong> on the laptop, and he appreciated the work done on it.</p>
+
+    <h2>🗣️ Final Conversation</h2>
+    <p>At the end of the interview, I asked the interviewer if they could provide some feedback.</p>
+    <blockquote>
+      "Rohan, your area of interest is clearly in mobile application development. We recommend that you pursue that path further. We will not be proceeding with your application here, but best of luck for your future!"
+    </blockquote>
+
+    <h2>📌 Final Status</h2>
+    <p>❌ Not selected, but I received positive feedback about my portfolio and clarity in direction toward mobile app development.</p>
+
+    <h2>💡 Key Takeaway</h2>
+    <p>This interview helped me identify and confirm my passion for <strong>iOS and mobile development</strong>. Even though I wasn’t selected, the feedback was encouraging and helped me stay focused on my strengths.</p>
+  </main>`,
+  "moschip": `<header>
+    <h1>🚀 My Interview Experience at MOSCHIP – SDE Technical Intern Role</h1>
+    <p>📍 Campus Placement | Location: Pune / Ahmedabad | Stipend: ₹9000 + PPO Opportunity</p>
+  </header>
+
+  <main style="padding: 2rem; line-height: 1.7;">
+    <p><strong>MOSCHIP</strong> was the first company that visited our campus for placement. It offered a <strong>₹9000 stipend</strong> with the possibility of a <strong>Pre-Placement Offer (PPO)</strong>. The available roles were divided into <strong>technical</strong> and <strong>non-technical</strong> positions, with locations in Pune and Ahmedabad.</p>
+
+    <h2>📝 Assessment Round</h2>
+    <p>I was shortlisted for the <strong>assessment round</strong> and appeared for it. After two days, the results were declared — I was among the students selected for the interview process.</p>
+
+    <p>From the entire batch, <strong>50 students</strong> were shortlisted for the interview. Based on roles, we were divided into respective categories. I appeared for the <strong>technical interview</strong>.</p>
+
+    <h2>💼 Interview Experience</h2>
+    <p>The interview was more than moderate in terms of difficulty. Here's what was covered:</p>
+
+    <ul>
+      <li>✅ <strong>Data Structures:</strong> General questions and usage scenarios</li>
+      <li>✅ <strong>C Programming:</strong> Focused on functions like <code>malloc()</code> and <code>calloc()</code>, and where these are used in memory management</li>
+      <li>✅ <strong>Project Discussion:</strong> I was asked to explain and draw the architecture of my mobile application development project</li>
+    </ul>
+
+    <p>I successfully explained my app’s structure and UI flow, and the interviewers seemed happy with my clarity and presentation. They appreciated my diagram and approach.</p>
+
+    <h2>🎓 Academic Question</h2>
+    <p>Finally, I was asked about a subject from my last semester. Initially, I panicked and couldn't recall it for about 5 minutes, but later I remembered and gave the correct answer.</p>
+
+    <h2>🚫 Outcome</h2>
+    <p>Despite performing decently and impressing the panel with my project explanation, I was <strong>not selected</strong> in the final list. However, it was a valuable learning experience.</p>
+
+    <h2>💡 Takeaway</h2>
+    <p>This experience taught me the importance of being calm under pressure and being well-prepared with academic subjects. I also realized how crucial it is to explain projects with clarity and confidence — something that worked in my favor during this interview.</p>
+
+    <p><strong>Tip for others:</strong> Practice explaining your projects and brush up on both coding and academic subjects. Always stay confident and composed, even when you momentarily forget something.</p>
+  </main>`,
+  "namekart": `<header>
+    <h1>🚀 My Interview Experience at Namekart – iOS Developer Intern</h1>
+    <p>Off-Campus | 3rd Year, 2nd Semester | Final Year Computer Engineering Student</p>
+  </header>
+
+  <main style="padding: 2rem; line-height: 1.7;">
+    <p>During my third year (second semester), I appeared for an off-campus interview process with <strong>Namekart</strong> for the position of <strong>iOS Application Developer Intern</strong>.</p>
+
+    <h2>1️⃣ Shortlisting & Online Test</h2>
+    <p>I was shortlisted by the company and received a test link to appear for the first round. The test focused on general iOS development knowledge, logical thinking, and coding basics.</p>
+
+    <h2>2️⃣ Technical Interview</h2>
+    <p>After successfully completing the test, I received an email for the next round: the <strong>Technical Interview</strong>. Topics covered included:</p>
+    <ul>
+      <li>✅ iOS basics (Swift, View lifecycle, UIKit/SwiftUI)</li>
+      <li>✅ Object-Oriented Programming (OOP) concepts</li>
+      <li>✅ Data Structures (Array, Linked List, String manipulation)</li>
+    </ul>
+    <p>The interviewer assessed both my coding logic and fundamental understanding of development principles.</p>
+
+    <h2>3️⃣ HR Round</h2>
+    <p>I reached the HR round, where we discussed my academic journey and internship expectations. However, the company was specifically looking for final-year students who had already completed their degree.</p>
+
+    <h2>🚫 Outcome</h2>
+    <p>Since I was still in the third year at that time, I wasn’t selected. However, reaching this stage gave me valuable experience and boosted my confidence.</p>
+
+    <h2>💡 Takeaway</h2>
+    <p>This opportunity helped me understand the structure of a real interview process: test → technical → HR. I realized the importance of DSA, OOP concepts, and iOS fundamentals in interviews.</p>
+
+    <p><strong>Advice for students:</strong> Keep practicing iOS concepts, DSA, and mock interviews — even if you don’t meet all eligibility criteria now, you’ll be ready when the time comes! 💪📱</p>
+  </main>`,
+  "nandana": `<header>
+    <h1>Nandana</h1>
+    <p>Interview Experience @ Tech Mahindra</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>Tech Mahindra - Data Analyst</h2>
+
+    <p><strong>Drive Period:</strong> November<br/>
+    <strong>Drive Type:</strong> Campus (All rounds completed in a single day)</p>
+
+    <p><strong>Round 1: Aptitude Test</strong><br/>
+    Conducted at the campus with 3 sections:
+    <ul>
+      <li>Section 1: SQL</li>
+      <li>Section 2: English</li>
+      <li>Section 3: Basic Aptitude</li>
+    </ul>
+    <em>Result declared within 1–2 hours</em>
+    </p>
+
+    <p><strong>Round 2: Technical Interview</strong><br/>
+    <ul>
+      <li><strong>Duration:</strong> 40 minutes</li>
+      <li><strong>Topics Covered:</strong> Python (basic coding), SQL, OOP (inheritance code), projects, internship</li>
+      <li>Also discussed extracurriculars mentioned in the resume</li>
+    </ul>
+    </p>
+
+    <p><strong>Round 3: Technical Interview 2</strong><br/>
+    <ul>
+      <li><strong>Duration:</strong> 30 minutes</li>
+      <li>Conducted online with a Tech Mahindra employee</li>
+      <li>Focused on projects, basic coding, and some personal information</li>
+    </ul>
+    </p>
+
+    <p><strong>Round 4: HR Interview</strong><br/>
+    <ul>
+      <li><strong>Duration:</strong> 5 minutes</li>
+      <li>Basic discussion about company policies and benefits</li>
+    </ul>
+    </p>
+
+    <p><strong>Result:</strong> Selected at Tech Mahindra</p>
+
+    <p>This experience was shared by <strong>Nandana</strong>.</p>
+
+    
+  </div>`,
+  "nikhil": `<header>
+    <h1>Nikhil Takle</h1>
+    <p>Interview Experience @ Alfa Laval</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>Alfa Laval - Interview Experience</h2>
+
+    <h3>Round 1: AON Assessment (Online)</h3>
+    <ul>
+      <li>Type: Quantitative Aptitude + Game-based Psychometric</li>
+      <li>Quant Topics: AP, GP, Quadratic Equations, Series, Profit & Loss, Mixtures</li>
+      <li>Game Section: Memory games, pattern puzzles, and level-based tasks</li>
+      <li>Selection based on highest levels achieved + Quant performance</li>
+      <li>Difficulty: Moderate</li>
+    </ul>
+
+    <h3>Round 2: Physical Interview (At Alfa Laval Office, Pune Station)</h3>
+
+    <p><strong>Pre-Placement Talk:</strong> Conducted before interviews to introduce the company and role.</p>
+
+    <h4>Interview 1: Technical Interview</h4>
+    <ul>
+      <li>Topics Covered: Self-introduction, resume and project discussion, certifications, company knowledge</li>
+      <li>Technical Concepts: OOPs (with real-life examples), DBMS, SQL, DSA, basic problem-solving</li>
+      <li>Custom questions based on interviewer’s expertise (e.g., cybersecurity)</li>
+      <li>Tip: Strong resume knowledge and basic fundamentals are key</li>
+      <li>Difficulty: Moderate</li>
+    </ul>
+
+    <h4>Interview 2: Managerial / HR Interview</h4>
+    <ul>
+      <li>Questions: Personal background (excluding skills), family, hobbies, future ambitions</li>
+      <li>Company-focused: Asked about company details to check preparation</li>
+      <li>Situational Questions: Designed to assess thinking and decision-making</li>
+      <li>Difficulty: Moderate</li>
+    </ul>
+
+    <p><strong>Important Tip:</strong> Research the company well before the interview. It plays a vital role in selection.</p>
+
+    <p><strong>Final Result:</strong> ✅ <strong>Selected</strong> — Congratulations to <strong>Nikhil Takle</strong>!</p>
+
+    
+  </div>`,
+  "niranjan": `<header>
+    <h1>Niranjan Yadav</h1>
+    <p>Interview Experience @ LTIMindtree</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>LTIMindtree - Software Developer Role</h2>
+
+    <p><strong>Round 1: Online Assessment</strong><br/>
+    This round included quantitative aptitude questions covering:
+    <ul>
+      <li>Arithmetic Progression (AP)</li>
+      <li>Geometric Progression (GP)</li>
+      <li>Quadratic Equations</li>
+      <li>Series-based questions</li>
+      <li>Profit & Loss</li>
+      <li>Mixtures</li>
+    </ul>
+    The difficulty level was moderate and manageable within the given time. <br/><br/>
+    Additionally, there was an English communication section. A sentence was displayed on the screen for a few seconds, after which candidates had to speak it aloud clearly and confidently once it disappeared.</p>
+
+    <p><strong>Round 2: Technical Interview</strong><br/>
+    Conducted virtually on-campus through individual laptops.<br/>
+    Key areas covered:
+    <ul>
+      <li>Self-introduction</li>
+      <li>Resume and project-based questions</li>
+      <li>Certificate discussion</li>
+      <li>OOPs concepts with real-life examples</li>
+      <li>DBMS fundamentals</li>
+      <li>SQL vs NoSQL</li>
+      <li>Java coding: Patterns, Toggle String, Bubble Sort, Selection Sort</li>
+    </ul>
+    </p>
+
+    <p><strong>Round 3: HR Interview</strong><br/>
+    A casual, personality-focused round. Common questions included:
+    <ul>
+      <li>Discussion on hobbies and ambitions</li>
+      <li>Willingness to relocate</li>
+      <li>Availability for rotational shifts</li>
+    </ul>
+    </p>
+
+    <p><strong>Result:</strong> Selected at LTIMindtree</p>
+
+    <p>This experience was shared by <strong>Niranjan Yadav</strong>, a friend of Rohan Sakhare.</p>
+
+    
+  </div>`,
+  "omkar": `<header>
+    <h1>Omkar Nawale</h1>
+    <p>Interview Experience @ HSBC</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>🏢 Selected for Role at HSBC</h2>
+
+    <p><strong>📋 Total Rounds:</strong> 5</p>
+
+    <p><strong>🧠 1. Online Aptitude:</strong><br/>
+      Included standard aptitude questions along with computer fundamentals such as <strong>Computer Networks, OOP</strong>, and other core CS concepts.
+    </p>
+
+    <p><strong>💻 2. Coding Assessment:</strong><br/>
+      Consisted of <strong>DSA-based coding questions</strong> requiring efficient logic and implementation.
+    </p>
+
+    <p><strong>📘 3. HSBC Values Assessment:</strong><br/>
+      This round included <strong>scenario-based ethical questions</strong> to assess alignment with HSBC’s core values.
+    </p>
+
+    <p><strong>🧪 4. Technical Interview (On Campus):</strong><br/>
+      A very creative and detailed round — the interviewer covered a <strong>wide range of SDLC domains</strong> from basic to advanced concepts in an engaging manner.
+    </p>
+
+    <p><strong>🗣️ 5. HR Interview (On Campus):</strong><br/>
+      Covered standard HR questions related to personal background, goals, flexibility, strengths, and workplace readiness.
+    </p>
+
+    <p><strong>✅ Verdict:</strong> <span style="color:lightgreen;"><strong>Selected</strong></span></p>
+
+    <p>This experience was shared by <strong>Omkar Nawale</strong>, a friend of Rohan Sakhare.</p>
+
+    
+  </div>`,
+  "oop": `<h1>🔷 Top 100 OOP Interview Questions</h1>
+
+  <div class="problem-list">
+    <ol>
+      <li>What is Object-Oriented Programming?</li>
+      <li>What are the four main pillars of OOP?</li>
+      <li>Explain encapsulation with an example.</li>
+      <li>What is abstraction?</li>
+      <li>What is inheritance?</li>
+      <li>What is polymorphism?</li>
+      <li>Difference between compile-time and run-time polymorphism?</li>
+      <li>What is a class?</li>
+      <li>What is an object?</li>
+      <li>Difference between class and object?</li>
+      <li>What is a constructor?</li>
+      <li>Types of constructors in C++/Java?</li>
+      <li>What is a destructor?</li>
+      <li>What is method overloading?</li>
+      <li>What is method overriding?</li>
+      <li>What is operator overloading?</li>
+      <li>What is data hiding?</li>
+      <li>Difference between abstraction and encapsulation?</li>
+      <li>What is a virtual function?</li>
+      <li>What is pure virtual function?</li>
+      <li>What is an abstract class?</li>
+      <li>What is an interface?</li>
+      <li>Difference between abstract class and interface?</li>
+      <li>What is multiple inheritance?</li>
+      <li>Does Java support multiple inheritance?</li>
+      <li>What is hybrid inheritance?</li>
+      <li>What are access specifiers?</li>
+      <li>Difference between private, protected, and public?</li>
+      <li>What is static keyword?</li>
+      <li>What is final keyword?</li>
+      <li>What is the use of 'this' keyword?</li>
+      <li>What is super keyword?</li>
+      <li>Difference between static and dynamic binding?</li>
+      <li>What is composition in OOP?</li>
+      <li>What is aggregation?</li>
+      <li>Difference between aggregation and composition?</li>
+      <li>What is association?</li>
+      <li>What is cohesion?</li>
+      <li>What is coupling?</li>
+      <li>Difference between high and low coupling?</li>
+      <li>What is constructor chaining?</li>
+      <li>What is object slicing?</li>
+      <li>What is RTTI?</li>
+      <li>What is dynamic_cast?</li>
+      <li>What is upcasting and downcasting?</li>
+      <li>What is the SOLID principle?</li>
+      <li>Explain Single Responsibility Principle.</li>
+      <li>Explain Open-Closed Principle.</li>
+      <li>Explain Liskov Substitution Principle.</li>
+      <li>Explain Interface Segregation Principle.</li>
+      <li>Explain Dependency Inversion Principle.</li>
+      <li>What is the use of access modifiers?</li>
+      <li>What is deep copy and shallow copy?</li>
+      <li>What is friend function in C++?</li>
+      <li>What are virtual base classes?</li>
+      <li>Explain diamond problem in inheritance.</li>
+      <li>What are static methods?</li>
+      <li>Can constructor be static?</li>
+      <li>Can we override static methods?</li>
+      <li>What is object cloning?</li>
+      <li>What is finalize() method?</li>
+      <li>Explain the concept of immutability.</li>
+      <li>What is a copy constructor?</li>
+      <li>What is singleton class?</li>
+      <li>How to implement singleton class in Java?</li>
+      <li>Can we inherit a constructor?</li>
+      <li>What are anonymous classes?</li>
+      <li>What is garbage collection?</li>
+      <li>What is method hiding?</li>
+      <li>What is interface segregation principle?</li>
+      <li>What are design patterns?</li>
+      <li>What is factory pattern?</li>
+      <li>What is builder pattern?</li>
+      <li>What is adapter pattern?</li>
+      <li>What is observer pattern?</li>
+      <li>What is dependency injection?</li>
+      <li>What are accessors and mutators?</li>
+      <li>What is an inner class?</li>
+      <li>What is anonymous object?</li>
+      <li>What is method chaining?</li>
+      <li>What is a sealed class?</li>
+      <li>What is reflection?</li>
+      <li>Difference between interface and abstract class in real life?</li>
+      <li>Why multiple inheritance is not supported in Java?</li>
+      <li>What is late binding?</li>
+      <li>What is early binding?</li>
+      <li>Explain polymorphism with real life examples.</li>
+      <li>What are generic classes?</li>
+      <li>What is template in C++?</li>
+      <li>What are mixins?</li>
+      <li>What is duck typing?</li>
+      <li>Explain method resolution order (MRO).</li>
+      <li>What is a metaclass?</li>
+      <li>Difference between constructor and factory method?</li>
+      <li>Explain object pooling.</li>
+      <li>Explain access control in OOP.</li>
+      <li>How does OOP help in software development?</li>
+    </ol>
+  </div>`,
+  "optimum": `<header>
+    <h1>📋 My Interview Experience at Optimum Financial Solutions Pvt. Ltd.</h1>
+    <p>📍 Campus Placement | DY Patil Institute of Technology, Pimpri</p>
+  </header>
+
+  <main style="padding: 2rem; line-height: 1.7;">
+    <p><strong>Optimum Financial Solutions Pvt. Ltd.</strong> visited our college for a campus placement drive. My resume was shortlisted by the Training & Placement (T&P) department, and I was selected for the offline interview conducted at the college itself.</p>
+
+    <h2>🧠 Interview Process</h2>
+    <p>The interview was focused primarily on fundamental programming and MySQL concepts. Here are the key areas covered:</p>
+    <ul>
+      <li><strong>MySQL Queries</strong>: Including JOINs and SWAP logic</li>
+      <li><strong>Difference between <code>let</code> and <code>var</code></strong> in JavaScript</li>
+      <li><strong>What is <code>static</code> keyword</strong> and its purpose</li>
+      <li><strong>Write Code on Paper</strong>:
+        <ul>
+          <li>Reverse a string</li>
+          <li>Use of <code>for</code> loop</li>
+          <li>Print multiplication table of 5</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h2>📈 Result Status</h2>
+    <p>The final result of the interview is still pending. However, the questions asked were basic and straightforward, so I am hopeful about the outcome.</p>
+
+    <h2>💡 Takeaway</h2>
+    <p>This experience highlighted the importance of practicing core logic building, basic SQL queries, and pen-paper coding. These are common in finance and service-based company interviews.</p>
+  </main>`,
+  "portway": `<header>
+    <h1>📝 My Interview Experience at Portway International</h1>
+    <p>📍 Campus Placement | DY Patil Institute of Technology, Pimpri</p>
+  </header>
+
+  <main style="padding: 2rem; line-height: 1.7;">
+    <p>Portway International came to our college for a campus placement drive. The process started with two offline, pen-paper based rounds:</p>
+
+    <h2>🧪 Step 1: Aptitude Test (Offline)</h2>
+    <p>The first round was an aptitude test conducted in-person. Around <strong>140 students</strong> appeared for this round.</p>
+
+    <h2>🧪 Step 2: Python Test (Offline)</h2>
+    <p>After the aptitude test, a Python programming test was conducted, again on paper. Based on both test performances, only <strong>5 students</strong> were shortlisted for the interview round. I was proud to be one of them.</p>
+
+    <h2>🗣️ Technical Interview</h2>
+    <p>The interview was conducted in-person at our own campus. The panel asked a variety of questions:</p>
+    <ul>
+      <li>Detailed explanation of my project</li>
+      <li>Questions on MySQL and database concepts</li>
+      <li>SQLite-related queries</li>
+      <li>Node.js and Express.js – some technical questions</li>
+      <li>Two coding problems (which I solved correctly)</li>
+    </ul>
+
+    <h2>📉 Final Outcome</h2>
+    <p>Although I answered <strong>about 80% of the questions correctly</strong>, I was not selected for the final HR round. From the 5 shortlisted students, only 1 was selected to proceed further.</p>
+
+    <p>I still don’t know the exact reason for not being selected, but I took it positively and used it as motivation to improve further.</p>
+
+    <h2>💡 Learning</h2>
+    <p>This experience taught me that clearing written and even technical interviews doesn’t always guarantee a selection. Sometimes companies have very limited seats, or are looking for a very specific skill set. Still, I gave my best and it boosted my confidence in facing offline interviews and paper-based coding rounds.</p>
+  </main>`,
+  "prachi": `<header>
+    <h1>Prachi Gujrathi</h1>
+    <p>Interview Experience @ L&T</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>L&T - Electronics & Telecommunication Engineer</h2>
+
+    <p><strong>Overview:</strong><br/>
+    The selection process started with an <strong>Online Test Round</strong>, followed by a <strong>Technical Interview</strong> and finally an <strong>HR Interview</strong>.
+    </p>
+
+    <p><strong>1. Online Test Round:</strong></p>
+    <ul>
+      <li>Branch-related questions focused on core subjects from Electronics and Telecommunication such as Digital Electronics, Microcontrollers, and Communication Systems.</li>
+      <li>Coding questions tested logical thinking and programming skills in languages like C++ and Python.</li>
+      <li>Problems included pattern printing, basic data structure operations, and logic-building exercises.</li>
+    </ul>
+
+    <p><strong>2. Technical Interview:</strong></p>
+    <ul>
+      <li>Questions on core technical subjects like Digital Electronics and Microprocessor 8085.</li>
+      <li>Basic programming and logic-building tasks were also asked.</li>
+      <li>Final year project discussion: “IoT-Based Mining Tracking and Worker Safety Helmet”</li>
+      <ul>
+        <li>Explained usage of components such as ATmega328P, ESP8266 Wi-Fi module, GPS, pulse sensor, and gas sensor.</li>
+        <li>Described the implementation, challenges, and functionality in detail.</li>
+      </ul>
+      <li>Scenario-based questions to assess real-world problem-solving and analytical thinking.</li>
+      <li>The interviewer was supportive and encouraged clear communication of ideas.</li>
+    </ul>
+
+    <p><strong>3. HR Interview:</strong></p>
+    <ul>
+      <li>Tell me about yourself</li>
+      <li>Your strengths and weaknesses</li>
+      <li>Are you open to relocation and working in a team?</li>
+      <li>The HR was friendly and the conversation felt natural and relaxed.</li>
+    </ul>
+
+    <p><strong>Final Thoughts:</strong><br/>
+      The entire interview experience was enriching and helped me grow both technically and personally. I appreciated how the process tested not just theoretical knowledge, but also practical thinking and communication skills.
+    </p>
+
+    <p><strong>Result:</strong> Selected at L&T</p>
+
+    <p>This experience was shared by <strong>Prachi Gujrathi</strong>, a friend of Rohan Sakhare.</p>
+
+    
+  </div>`,
+  "pranit": `<header>
+    <h1>Pranit Mane</h1>
+    <p>Interview Experience @ IBM</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>IBM - Software Developer</h2>
+
+    <p><strong>Round 1: Resume Shortlisting</strong><br/>
+    Candidates were shortlisted based on resume evaluation, focusing on relevant projects, technical skills, and academic performance.</p>
+
+    <p><strong>Round 2: Coding Round (Online)</strong><br/>
+    <ul>
+      <li>Platform: HackerRank</li>
+      <li>Duration: 45 minutes</li>
+      <li>Programming Language Options: Java or C++</li>
+      <li>Key Topics: Arrays and Strings</li>
+      <li>Difficulty Level: Easy to Moderate</li>
+    </ul>
+    </p>
+
+    <p><strong>Round 3: Coding Round (Offline)</strong><br/>
+    <ul>
+      <li>Two coding questions similar to the online round</li>
+      <li>Difficulty Level: Easy to Moderate</li>
+    </ul>
+    </p>
+
+    <p><strong>Round 4: English Assessment (Offline)</strong><br/>
+    <ul>
+      <li>Included a short essay on a given topic</li>
+      <li>Grammar-based MCQs</li>
+    </ul>
+    </p>
+
+    <p><strong>Round 5: Group Discussion (Offline)</strong><br/>
+    <ul>
+      <li>Topic-based group debate</li>
+      <li>Focused on communication skills</li>
+    </ul>
+    </p>
+
+    <p><strong>Round 6: Technical + HR Interview (Offline)</strong><br/>
+    <ul>
+      <li><strong>Technical Questions:</strong> Project discussion, Sorting algorithm implementation, SQL queries, OOPs in Java</li>
+      <li><strong>HR Questions:</strong> Behavioral and situational questions assessing communication, attitude, and cultural fit</li>
+    </ul>
+    </p>
+
+    <p><strong>Result:</strong> Selected at IBM</p>
+
+    <p>This experience was shared by <strong>Pranit Mane</strong>, Computer Engineering student.</p>
+
+    
+  </div>`,
+  "pratik": `<header>
+    <h1>Pratik Borse</h1>
+    <p>Interview Experience @ Cognizant</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>🏢 Cognizant - Interview Experience</h2>
+    <p><strong>👨‍🎓 Branch:</strong> Mechanical Engineering</p>
+    <p><strong>✅ Result:</strong> Selected</p>
+
+    <div class="section-title">🔹 Round 1: Communication Assessment</div>
+    <ul>
+      <li>Type: Online (30–40 Questions, 7 Sections)</li>
+      <li>Topics: Basic Grammar, Reading Comprehension, Error Spotting, Sentence Correction, Spoken Opinion</li>
+    </ul>
+    <p class="tip">Tip: Speak clearly and stay grammatically correct in the speaking section.</p>
+
+    <div class="section-title">🔹 Round 2: Aptitude Test</div>
+    <ul>
+      <li>Type: Online</li>
+      <li>Topics: Percentages, Profit & Loss, Ratio–Proportion, Time & Work, Puzzles, Seating Arrangement, Game-based Aptitude</li>
+    </ul>
+    <p class="tip">Tip: Focus on accuracy and time management.</p>
+
+    <div class="section-title">🔹 Shortlisting</div>
+    <p>Combined result of Round 1 and Round 2 was used to shortlist candidates for Round 3.</p>
+
+    <div class="section-title">🔹 Round 3: Technical Assessment</div>
+    <ul>
+      <li><strong>SQL Section:</strong> Write queries using JOIN; fetch employee details with conditions</li>
+      <li><strong>Java Section:</strong> One question on Collections; one on Graph logic</li>
+      <li><strong>HTML/CSS/JS Section:</strong> Complete missing code to design card UI; on button click show profile name and image</li>
+    </ul>
+    <p class="tip">Tip: Practice basic Java DSA, SQL joins, and dynamic HTML/CSS/JS tasks.</p>
+
+    <div class="section-title">🔹 Round 4: Interview (Technical + HR)</div>
+    <ul>
+      <li>Mode: Virtual (On-campus)</li>
+      <li>Duration: ~25 minutes</li>
+    </ul>
+    <p><strong>Questions Asked:</strong></p>
+    <ul>
+      <li>Why shift from Mechanical to IT?</li>
+      <li>How to initialize a String in Java?</li>
+      <li>Explain ArrayList & difference with Array</li>
+      <li>What is static in Java?</li>
+      <li>What happens if <code>public static void main()</code> is missing?</li>
+      <li>What are Collections?</li>
+      <li>Explain your Car Rental System project</li>
+      <li>Your role at internship?</li>
+      <li>What is method overloading vs overriding?</li>
+      <li>Write a basic SQL JOIN query</li>
+      <li>Difference between SQL & NoSQL</li>
+      <li>Are you ready to relocate?</li>
+      <li>Any certifications?</li>
+      <li>Any questions for me?</li>
+    </ul>
+
+    <p><strong>📍 Verdict:</strong> Selected in Cognizant</p>
+
+    
+  </div>`,
+  "priyanka": `<header>
+    <h1>Priyanka Thakur</h1>
+    <p>Interview Experience @ NICE (Jr. Software Developer)</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>NICE - Jr. Software Developer</h2>
+
+    <p><strong>Online Assessment:</strong><br/>
+    The test included Aptitude, Reasoning, and 3 Coding Questions:<br/>
+    - 2 questions could be solved in any language (C, C++, Python, Java)<br/>
+    - 1 question was mandatory in Java<br/>
+    After shortlisting, selected candidates were called to the office for interviews.</p>
+
+    <p><strong>Technical Interview:</strong><br/>
+    The interview focused heavily on Java concepts since I had mentioned it in my resume. Questions included:<br/>
+    - Java Memory Management<br/>
+    - Difference between <code>String</code>, <code>StringBuffer</code>, and <code>StringBuilder</code> with code (written on paper)<br/>
+    - <code>HashMap</code> usage and how memory is managed in it<br/>
+    - Object-Oriented Programming concepts<br/>
+    - DBMS: If primary key exists, why indexing is needed?<br/>
+    - One puzzle was asked (involving 3 buckets of 3L, 4L, and 5L - not fully recalled)<br/>
+    Also asked: My hobbies and weaknesses.<br/><br/>
+    <em>Tip:</em> If you can't answer a question, say positively: “Right now I can't recall, but I’ll definitely read about it after this.” It shows you’re willing to learn.</p>
+
+    <p><strong>Managerial Interview:</strong><br/>
+    Lasted around 50 minutes. It began with a detailed introduction:<br/>
+    - Family background, schooling, etc.<br/>
+    - In-depth discussion on the projects mentioned in my resume<br/>
+    - Asked about my virtual internship at NICE, the project, and tech stack used<br/>
+    <em>This round tested my behavior, thought process, and attitude towards problem-solving.</em></p>
+
+    <p><strong>HR Interview:</strong><br/>
+    A short round (15–20 mins). Questions included:<br/>
+    - Brief introduction and background<br/>
+    - Why I want to join NICE<br/>
+    - Hobbies and how I pursue them daily<br/>
+    - “What will you do with your first salary?”<br/><br/>
+    <em>Overall Insight:</em> It’s not just about technical knowledge, but also your attitude, problem-solving approach, mindset, and learning willingness. Stay calm and don’t give up!</p>
+
+    <p><strong>Result:</strong><br/>
+    <span style="color: #00e0ff; font-weight: bold;">Selected</span> at NICE as Jr. Software Developer.</p>
+
+    
+  </div>`,
+  "pumang": `<header>
+    <h1>Pumang Kirange</h1>
+    <p>Interview Experience @ Capgemini</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>Capgemini - Software Developer Role</h2>
+
+    <p><strong>Introduction Round</strong><br/>
+    The interview began with a basic self-introduction. I shared my background, interests, and technical areas I am passionate about.</p>
+
+    <p><strong>Internship Discussion</strong><br/>
+    They asked about my past internship at <strong>TraceLink</strong>. I explained the responsibilities I handled, tools and technologies I worked with, and how my contributions helped the team and the company overall.</p>
+
+    <p><strong>Favorite Subject Discussion</strong><br/>
+    I was asked about my favorite academic subject. I mentioned <em>(insert your favorite subject here, e.g., Data Structures or DBMS)</em> and they followed up with some basic and conceptual questions on that topic to assess understanding.</p>
+
+    <p><strong>Hobby Discussion</strong><br/>
+    The interviewer asked about my hobbies. I shared that <em>(insert your hobby here, e.g., playing chess or photography)</em> is something I actively pursue and explained how I stay engaged with it regularly.</p>
+
+    <p><strong>Result:</strong> Selected at Capgemini</p>
+
+    <p>This experience was shared by <strong>Pumang Kirange</strong>, EX-intern at TraceLink and a friend of Rohan Sakhare.</p>
+
+    
+  </div>`,
+  "queue": `<h1>📚 Most Asked Queue Interview Problems</h1>
+
+  <div class="problem-list">
+    <ol>
+      <li>Implement Queue Using Array</li>
+      <li>Implement Queue Using Linked List</li>
+      <li>Implement Circular Queue</li>
+      <li>Implement Deque (Double-Ended Queue)</li>
+      <li>Reverse a Queue Using Stack</li>
+      <li>Generate Binary Numbers from 1 to N Using Queue</li>
+      <li>Implement Stack Using Queues</li>
+      <li>Interleave First and Second Halves of Queue</li>
+      <li>Check if Queue is Palindrome</li>
+      <li>Reverse First K Elements of Queue</li>
+      <li>Queue Using Two Stacks</li>
+      <li>First Non-Repeating Character in Stream</li>
+      <li>Implement Priority Queue</li>
+      <li>Rotten Oranges Problem (Multi-Source BFS)</li>
+      <li>Sliding Window Maximum</li>
+      <li>Sum of Minimums of All Subarrays</li>
+      <li>Design Circular Deque</li>
+      <li>LRU Cache Implementation</li>
+      <li>Max Sliding Window (Monotonic Queue)</li>
+      <li>Number of Recent Calls (Leetcode 933)</li>
+      <li>Course Schedule (Topological Sort - BFS)</li>
+      <li>Print First Negative Integer in Every Window</li>
+      <li>Design Hit Counter</li>
+      <li>Queue Reconstruction by Height</li>
+      <li>Jump Game with Minimum Moves (Using Queue)</li>
+      <li>Design Snake Game</li>
+      <li>Implement k Queues in a Single Array</li>
+      <li>Reversing Elements in Groups of k</li>
+      <li>Flatten Nested List Iterator</li>
+      <li>Task Scheduler (Greedy + Queue)</li>
+    </ol>
+  </div>`,
+  "revature": `<header>
+    <h1>🎯 My Interview Experience at Revature – Training & Placement Program</h1>
+    <p>📍 Online Process | Training & Client-Based Projects | Self-Development Program</p>
+  </header>
+
+  <main style="padding: 2rem; line-height: 1.7;">
+    <p>I recently attended the interview process at <strong>Revature</strong>, a company that offers training and development programs and connects talent with client companies for real-world projects.</p>
+
+    <h2>🧠 Round 1: Logical & Aptitude Assessment</h2>
+    <p>The first round was an online assessment focused on <strong>logical reasoning</strong> and <strong>aptitude</strong> skills. It tested analytical thinking, basic mathematics, and problem-solving speed. I successfully cleared this round.</p>
+
+    <h2>💻 Round 2: Technical Assessment</h2>
+    <p>This round tested <strong>technical knowledge</strong> related to programming fundamentals and basic computer science concepts. Clearing this round led me to the interview phase.</p>
+
+    <h2>🗣️ HR Interview</h2>
+    <p>The final interview was HR-based and revolved around my background and personality. Some of the questions included:</p>
+    <ul>
+      <li>📘 What is your educational background?</li>
+      <li>💼 How many companies have you applied to or interviewed with?</li>
+      <li>💪 What are your strengths?</li>
+      <li>📉 What are your weaknesses?</li>
+      <li>🎓 What is your CGPA?</li>
+      <li>🏆 What extracurricular activities have you participated in?</li>
+    </ul>
+    <p>The interview mainly focused on understanding my career goals and how well I would fit into Revature's training and client-based deployment model.</p>
+
+    <h2>📌 Final Thoughts</h2>
+    <p>Revature offers a unique opportunity by providing training along with placement in client companies. The process was structured and smooth, and it helped me reflect more deeply on my own strengths and direction.</p>
+  </main>`,
+  "rutuja": `<header>
+    <h1>Rutuja Swant</h1>
+    <p>Interview Experience @ Pega Systems</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>Pega Systems - Computer Engineering</h2>
+
+    <p><strong>Initial Test - 3 Hours:</strong><br/>
+    This round included a comprehensive online test covering:<br/>
+    - Aptitude<br/>
+    - Communication skills<br/>
+    - Logical puzzles<br/>
+    - Technical multiple choice questions<br/>
+    - 1–2 coding problems</p>
+
+    <p><strong>Interview Rounds:</strong></p>
+    <p><strong>1. Technical Round 1:</strong><br/>
+    Focused on DBMS, Software Engineering, OOP concepts, and Agile methodologies. Basic DSA questions were asked as well.</p>
+
+    <p><strong>2. Technical Round 2:</strong><br/>
+    Continued with Java-specific questions, OOP design, and debugging simple programs. More emphasis on practical coding understanding.</p>
+
+    <p><strong>3. Managerial Round:</strong><br/>
+    Questions about teamwork, project ownership, and how you handle deadlines and collaboration in team environments.</p>
+
+    <p><strong>4. Director/Senior Manager Round:</strong><br/>
+    Discussion on career goals, deeper technical expectations, and fitment for long-term roles within the company.</p>
+
+    <p><strong>5. HR Round:</strong><br/>
+    Covered standard HR topics such as strengths, weaknesses, salary expectations, willingness to relocate, and company culture fit.</p>
+
+    <p><strong>Additional Notes:</strong><br/>
+    Preferred language was <strong>Java</strong>. 2–3 questions were based on DSA—mostly sorting and simple algorithm problems.</p>
+
+    <p><strong>Result:</strong><br/>
+    <span style="color: #00e0ff; font-weight: bold;">Selected</span> at Pega Systems.</p>
+
+    
+  </div>`,
+  "sakshi": `<header>
+    <h1>Sakshi Patil</h1>
+    <p>Interview Experience @ mthree</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>💼 Selected for SRE Role at mthree</h2>
+
+    <p><strong>📧 HR Mail Received:</strong> 13th May 2025</p>
+
+    <p><strong>🗣️ HR Interview (~35 min):</strong></p>
+    <ul>
+      <li>Introduce yourself</li>
+      <li>Family background</li>
+      <li>Hobbies</li>
+      <li>Any offer in hand?</li>
+      <li>Are you ready to relocate?</li>
+      <li>Preferred locations: Pune and Mumbai</li>
+      <li>Any plans for higher studies?</li>
+      <li>Any plans for government exams?</li>
+      <li>Why mthree?</li>
+      <li>What do you know about mthree?</li>
+      <li>Do you know for which role you're interviewing?<br/>
+        ↳ I wasn't sure, so I said I'd seen roles like SDE, SRE, Banking Analyst, Support Analyst.<br/>
+        ↳ HR clarified this interview was for <strong>SRE</strong> (Site Reliability Engineer).
+      </li>
+      <li>Situation-based: How would you handle issues while debugging a task?</li>
+      <li>Why did you choose the AI&DS branch?</li>
+      <li>What motivates you to work in the IT sector?</li>
+      <li>Training overlap scenario:
+        <br/>Training starts on 26th May and my end-sem exams were from 24–31 May.
+        <br/>I said I’d take leave for exam days and attend training on the rest, but I’d consult my TPO.
+      </li>
+      <li>Do you have knowledge of server management, Linux, cloud computing?</li>
+      <li>How would you rate yourself in Python?</li>
+    </ul>
+
+    <p><strong>💻 Technical Interview:</strong></p>
+    <ul>
+      <li>Answered most questions confidently</li>
+      <li>Got the time complexity question wrong, but remained composed throughout</li>
+    </ul>
+
+    <p><strong>🎉 Final Selection:</strong><br/>
+    Received confirmation mail on <strong>19th May 2025</strong> for the <strong>SRE (Site Reliability Engineer)</strong> role at mthree.</p>
+
+    <p>This experience was shared by <strong>Sakshi Patil</strong>, a friend of Rohan Sakhare.</p>
+
+    
+  </div>`,
+  "shreyash": `<header>
+    <h1>Shreyash Kulkarni</h1>
+    <p>Interview Experience @ Cloud4C</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>☁️ Selected at Cloud4C</h2>
+
+    <p><strong>College:</strong> Dr. D.Y. Patil Institute of Technology (DIT)</p>
+
+    <p><strong>Overall Experience:</strong> The hiring process was very smooth and well-organized.</p>
+
+    <p><strong>🧠 Aptitude Round:</strong><br/>
+      General aptitude questions to test logical and numerical reasoning.
+    </p>
+
+    <p><strong>💻 Coding Round:</strong><br/>
+      Included <strong>3 coding questions</strong> (medium-level, similar to LeetCode problems) and <strong>10 MCQs</strong> based on data structures and algorithms.
+    </p>
+
+    <p><strong>🛠️ Technical Interview:</strong><br/>
+      Moderate-level interview based on the candidate's <strong>resume</strong> and <strong>final year project</strong>. Covered core technical concepts and implementation clarity.
+    </p>
+
+    <p><strong>🗣️ HR Interview:</strong><br/>
+      Basic HR questions related to background, strengths, relocation, and expectations. This round was easy and conversational.
+    </p>
+
+    <p><strong>✅ Verdict:</strong> <span style="color:lightgreen;"><strong>Selected</strong></span></p>
+
+    <p>This experience was shared by <strong>Shreyash Kulkarni</strong>, a friend of Rohan Sakhare.</p>
+
+    
+  </div>`,
+  "siemens": `<header>
+    <h1>💼 My Interview Experience at Siemens – Campus Placement</h1>
+    <p>📍 Virtual Assessment + In-Person Interview | College Campus Drive</p>
+  </header>
+
+  <main style="padding: 2rem; line-height: 1.7;">
+    <p><strong>Siemens</strong> visited our college for a campus placement drive. The process started with a proctored online assessment, followed by a detailed technical interview.</p>
+
+    <h2>📝 Round 1: Online Assessment</h2>
+    <p>The assessment was conducted on a <strong>multi-browser platform</strong> and could be taken from home or college. I appeared from home, and after successfully clearing it, I was shortlisted for the interview.</p>
+
+    <p>Only <strong>8 students from my college</strong> made it to the interview round.</p>
+
+    <h2>💻 Round 2: Technical Interview</h2>
+    <p>The interview was taken by a female software engineer and lasted for almost <strong>1 hour</strong>. The focus of the interview was mostly on my project and object-oriented programming concepts.</p>
+
+    <p>Key topics discussed:</p>
+    <ul>
+      <li>🎨 Figma and UI/UX fundamentals (based on my project)</li>
+      <li>📱 Swift and SwiftUI</li>
+      <li>🗃️ SQLite and MySQL – including SQL query writing</li>
+      <li>🧠 Object-Oriented Programming – deep conceptual questions</li>
+    </ul>
+
+    <p>The interviewer was especially focused on <strong>OOP concepts</strong> and tested my knowledge in great detail. I was able to answer about <strong>80% of the questions</strong> confidently.</p>
+
+    <h2>📌 Final Status</h2>
+    <p>Despite performing well and expecting a positive outcome, my name wasn’t in the final selection list. This was disappointing, but the interview itself was one of the best learning experiences I’ve had.</p>
+
+    <h2>💡 Key Takeaway</h2>
+    <p>This interview taught me that:</p>
+    <ul>
+      <li>🧩 <strong>OOP and SQL</strong> cover nearly 70% of technical questions in such interviews.</li>
+      <li>🎯 Even if the result is not in your favor, every experience adds value to your preparation.</li>
+    </ul>
+
+    <p><strong>My Advice:</strong> For companies like Siemens, focus deeply on <strong>Object-Oriented Programming</strong> and <strong>SQL queries</strong> — they play a critical role in your evaluation.</p>
+  </main>`,
+  "sorting": `<h1>🔍 Most Asked Sorting & Searching Problems</h1>
+
+  <div class="problem-list">
+    <ol>
+      <li>Linear Search in Array</li>
+      <li>Binary Search (Iterative and Recursive)</li>
+      <li>Bubble Sort</li>
+      <li>Selection Sort</li>
+      <li>Insertion Sort</li>
+      <li>Merge Sort</li>
+      <li>Quick Sort</li>
+      <li>Count Sort</li>
+      <li>Radix Sort</li>
+      <li>Sort 0s, 1s and 2s (Dutch National Flag)</li>
+      <li>Find First and Last Occurrence (Binary Search)</li>
+      <li>Search in Rotated Sorted Array</li>
+      <li>Find Peak Element</li>
+      <li>Find Missing Number</li>
+      <li>Find Duplicate Number</li>
+      <li>Median of Two Sorted Arrays</li>
+      <li>Search in 2D Matrix</li>
+      <li>Find Element in Infinite Sorted Array</li>
+      <li>Floor and Ceil in Sorted Array</li>
+      <li>Number of Rotations in Rotated Sorted Array</li>
+      <li>Find K Closest Elements</li>
+      <li>Kth Smallest Element</li>
+      <li>Kth Largest Element in Array</li>
+      <li>Find Intersection of Two Sorted Arrays</li>
+      <li>Merge Two Sorted Arrays</li>
+      <li>Search in Nearly Sorted Array</li>
+      <li>Square Root using Binary Search</li>
+      <li>Find Element in Bitonic Array</li>
+      <li>Allocate Minimum Number of Pages</li>
+      <li>Aggressive Cows (Binary Search on Answer)</li>
+    </ol>
+  </div>`,
+  "sql": `<h1>📘 Top 100 DBMS & SQL Interview Questions</h1>
+
+  <div class="question-list">
+    <ol>
+      <li>What is DBMS?</li>
+      <li>Difference between DBMS and RDBMS</li>
+      <li>What is SQL?</li>
+      <li>Types of SQL commands</li>
+      <li>What is a primary key?</li>
+      <li>What is a foreign key?</li>
+      <li>What is normalization?</li>
+      <li>Types of normalization</li>
+      <li>What is denormalization?</li>
+      <li>What is a candidate key?</li>
+      <li>What is a unique key?</li>
+      <li>What is a composite key?</li>
+      <li>What is an index in SQL?</li>
+      <li>What is a view in SQL?</li>
+      <li>Difference between WHERE and HAVING</li>
+      <li>Difference between DELETE, TRUNCATE, and DROP</li>
+      <li>What is a join? Types of joins</li>
+      <li>What is a self join?</li>
+      <li>What is a cross join?</li>
+      <li>Difference between inner and outer join</li>
+      <li>What is a subquery?</li>
+      <li>What is a correlated subquery?</li>
+      <li>What is a stored procedure?</li>
+      <li>What is a trigger?</li>
+      <li>What is a transaction?</li>
+      <li>ACID properties in DBMS</li>
+      <li>What is a cursor?</li>
+      <li>What is a schema?</li>
+      <li>What is a relationship?</li>
+      <li>Types of relationships in DBMS</li>
+      <li>What is an ER model?</li>
+      <li>What is an entity and attribute?</li>
+      <li>Difference between clustered and non-clustered index</li>
+      <li>What is a surrogate key?</li>
+      <li>What is data redundancy?</li>
+      <li>What is data integrity?</li>
+      <li>What is the difference between DBMS and file system?</li>
+      <li>What is DDL, DML, DCL, TCL?</li>
+      <li>What is the use of GROUP BY clause?</li>
+      <li>What is the difference between UNION and UNION ALL?</li>
+      <li>What is a NULL value?</li>
+      <li>How to handle NULL in SQL?</li>
+      <li>What is the BETWEEN operator?</li>
+      <li>What is the LIKE operator?</li>
+      <li>What is IN operator?</li>
+      <li>What is EXISTS in SQL?</li>
+      <li>What is a materialized view?</li>
+      <li>What is indexing? Types of indexes</li>
+      <li>Difference between OLAP and OLTP</li>
+      <li>What is data warehousing?</li>
+      <li>What is a checkpoint in DBMS?</li>
+      <li>What is a deadlock in DBMS?</li>
+      <li>How to resolve deadlocks?</li>
+      <li>What is locking in DBMS?</li>
+      <li>What is a 2-phase commit?</li>
+      <li>What is log-based recovery?</li>
+      <li>What is shadow paging?</li>
+      <li>What are aggregate functions in SQL?</li>
+      <li>What is a constraint? Types of constraints</li>
+      <li>Difference between CHAR and VARCHAR</li>
+      <li>What is a sequence?</li>
+      <li>What is a synonym?</li>
+      <li>Explain normalization forms up to 3NF</li>
+      <li>What is BCNF?</li>
+      <li>Explain a real-time database example</li>
+      <li>How do you optimize SQL queries?</li>
+      <li>What is a Cartesian product?</li>
+      <li>What is indexing strategy?</li>
+      <li>What is data independence?</li>
+      <li>What is the difference between logical and physical data independence?</li>
+      <li>Explain SELECT statement syntax</li>
+      <li>How to perform JOIN using WHERE?</li>
+      <li>How to find duplicates in a table?</li>
+      <li>How to remove duplicates from a table?</li>
+      <li>Explain window functions in SQL</li>
+      <li>What is ROW_NUMBER() in SQL?</li>
+      <li>Difference between RANK() and DENSE_RANK()</li>
+      <li>What is PARTITION BY in SQL?</li>
+      <li>Explain CASE WHEN in SQL</li>
+      <li>What are scalar functions in SQL?</li>
+      <li>Explain DATE functions in SQL</li>
+      <li>What is COALESCE() in SQL?</li>
+      <li>What is NVL(), ISNULL(), IFNULL()</li>
+      <li>What is the difference between COUNT(*) and COUNT(column)?</li>
+      <li>How to update data using SQL?</li>
+      <li>What is the difference between UPDATE and MERGE?</li>
+      <li>Explain MERGE statement</li>
+      <li>How to backup and restore databases?</li>
+      <li>What is a temp table?</li>
+      <li>Difference between temp table and table variable</li>
+      <li>What is a pivot table in SQL?</li>
+      <li>What is the difference between SQL and MySQL?</li>
+      <li>How to connect MySQL with a programming language?</li>
+      <li>Write SQL query to get second highest salary</li>
+      <li>Write SQL query to find duplicate rows</li>
+      <li>Write query to display nth highest salary</li>
+      <li>What is the difference between SQL Server, Oracle, MySQL?</li>
+      <li>Explain transactions with example in SQL</li>
+      <li>What is the use of LIMIT in MySQL?</li>
+      <li>How to export and import databases in MySQL?</li>
+      <li>How to change column datatype in MySQL?</li>
+    </ol>
+  </div>`,
+  "stack": `<h1>📚 Most Asked Stack Interview Problems</h1>
+
+  <div class="problem-list">
+    <ol>
+      <li>Implement Stack Using Array</li>
+      <li>Implement Stack Using Linked List</li>
+      <li>Push, Pop, Peek Operations</li>
+      <li>Check for Balanced Parentheses</li>
+      <li>Next Greater Element</li>
+      <li>Implement Two Stacks in One Array</li>
+      <li>Sort a Stack Using Recursion</li>
+      <li>Insert Element at Bottom of Stack</li>
+      <li>Reverse a Stack Using Recursion</li>
+      <li>Evaluate Postfix Expression</li>
+      <li>Infix to Postfix Conversion</li>
+      <li>Infix to Prefix Conversion</li>
+      <li>Postfix to Infix Conversion</li>
+      <li>Prefix to Infix Conversion</li>
+      <li>Design a Stack That Supports getMin()</li>
+      <li>Check Redundant Brackets in Expression</li>
+      <li>Celebrity Problem Using Stack</li>
+      <li>Stock Span Problem</li>
+      <li>Largest Rectangle in Histogram</li>
+      <li>Find Maximum Area in Binary Matrix</li>
+      <li>Remove K Digits to Make Smallest Number</li>
+      <li>Decode a String (Leetcode 394)</li>
+      <li>Asteroid Collision</li>
+      <li>Daily Temperatures</li>
+      <li>Basic Calculator with Stack</li>
+      <li>Reverse First K Elements of Queue Using Stack</li>
+      <li>Implement Queue Using Stacks</li>
+      <li>Next Smaller Element</li>
+      <li>Implement Stack Using Queues</li>
+      <li>Check Stack Permutation is Valid</li>
+    </ol>
+  </div>`,
+  "string": `<h1>📘 String - Data Structure Topics</h1>
+  <p style="text-align:center;">Explore the most asked string problems in interviews, categorized by difficulty.</p>
+
+  <div class="section">
+    <div class="category">🟢 Easy Problems</div>
+    <div class="problem-list">
+      <ul>
+        <li>Reverse a String</li>
+        <li>Check Palindrome</li>
+        <li>Toggle Case of String</li>
+        <li>Count Vowels and Consonants</li>
+        <li>Remove Duplicates</li>
+        <li>Check Anagram</li>
+        <li>First Non-Repeating Character</li>
+        <li>Check for Substring</li>
+        <li>Find Duplicate Characters</li>
+        <li>Longest Common Prefix</li>
+        <li>Implement strstr()</li>
+        <li>Print All Substrings</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="category">🟡 Medium Problems</div>
+    <div class="problem-list">
+      <ul>
+        <li>Group Anagrams</li>
+        <li>Longest Palindromic Substring</li>
+        <li>Zigzag Conversion</li>
+        <li>Roman to Integer</li>
+        <li>Integer to Roman</li>
+        <li>Count and Say</li>
+        <li>String Compression</li>
+        <li>Minimum Add to Make Parentheses Valid</li>
+        <li>Valid Parentheses</li>
+        <li>Multiply Strings</li>
+        <li>Remove All Adjacent Duplicates</li>
+        <li>Longest Substring Without Repeating Characters</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="category">🔴 Hard Problems</div>
+    <div class="problem-list">
+      <ul>
+        <li>Wildcard Pattern Matching</li>
+        <li>Regular Expression Matching</li>
+        <li>Edit Distance</li>
+        <li>Minimum Window Substring</li>
+        <li>Longest Valid Parentheses</li>
+        <li>Interleaving Strings</li>
+        <li>Count Palindromic Subsequences</li>
+        <li>Concatenated Words</li>
+        <li>Word Break Problem</li>
+        <li>Find All Anagrams in String</li>
+        <li>Remove Invalid Parentheses</li>
+      </ul>
+    </div>
+  </div>`,
+  "suhelali": `<header>
+    <h1>Suhelali Pakjade</h1>
+    <p>Interview Experience @ Juspay</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>🎯 Juspay – Associate Software Development Engineer (React)</h2>
+
+    <p><strong>📞 Reaching Out & Getting In:</strong><br/>
+    I proactively messaged Juspay employees via <em>LinkedIn and email</em>. After consistent follow-ups, I received a surprise call from HR for a <strong>screening round</strong> — testing my communication, passion, and intent for the SDE role.
+    </p>
+
+    <p><strong>🧪 Round 1: React-Based Product Challenge</strong></p>
+    <ul>
+      <li>Task: Build a <strong>Scratch-like animation system</strong></li>
+      <li>Features included:
+        <ul>
+          <li>Sprite control</li>
+          <li>Animation switching</li>
+          <li>Collision detection</li>
+          <li>Visual block system</li>
+        </ul>
+      </li>
+      <li>Tech Used: ReactJS, dynamic sprite handling, animation logic</li>
+      <li>Outcome: Cleared the round with a call from HR saying “Let’s move to the next one!”</li>
+    </ul>
+
+    <p><strong>💻 Round 2: DSA Hackathon (Part A & B)</strong></p>
+    <ul>
+      <li><strong>Part A:</strong> "Tree of Space" Problem</li>
+      <li>Focus: Clarity, problem-solving approach, design thinking</li>
+      <li><strong>Part B:</strong> Code Optimization + Thread Safety</li>
+      <li>Tasks: Optimize Part A, ensure thread safety, implement custom data structures</li>
+      <li><strong>Duration:</strong> 5–6 hours per part (mentally intensive)</li>
+    </ul>
+
+    <p><strong>🧠 Round 3: Technical Interview</strong></p>
+    <ul>
+      <li>Panel: Senior SDE-3 Engineer</li>
+      <li>Topics Covered:
+        <ul>
+          <li>Self-introduction and resume/project discussion</li>
+          <li>CS Fundamentals: OOPs, DBMS, JavaScript internals, System Design basics</li>
+          <li><strong>React Deep Dive:</strong> 
+            <ul>
+              <li>Debug and explain useState & useEffect behavior</li>
+              <li>Implement useState and useEffect from scratch in plain JavaScript</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Feedback: “Good attempt, but you need to go deeper into how things actually work.”</li>
+    </ul>
+
+    <p><strong>☎️ The Call:</strong><br/>
+    A week later, I received a call I thought was a rejection. Instead, she said:<br/>
+    <em>“Congratulations! When can you join?”</em> 🥳
+    </p>
+
+    <p><strong>✅ Final Result:</strong> Selected at <strong>Juspay</strong></p>
+    <p><strong>Role:</strong> Associate Software Development Engineer (React)</p>
+    <p><strong>Status:</strong> Accepted</p>
+
+    <p>This experience was shared by <strong>Suhelali Pakjade</strong>, a friend of Rohan Sakhare.</p>
+
+    
+  </div>`,
+  "sumit": `<header>
+    <h1>Sumit Dhavale</h1>
+    <p>Interview Experience @ DataEconomy</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>DataEconomy - Python/Machine Learning Role</h2>
+
+    <p><strong>Drive Overview:</strong><br/>
+    <ul>
+      <li><strong>Location:</strong> Baner, Pune</li>
+      <li><strong>Type:</strong> Walk-in drive (same-day process)</li>
+      <li><strong>Total Participants:</strong> ~350 students</li>
+    </ul>
+    </p>
+
+    <p><strong>✅ Round 1: Aptitude + Technical Assessment</strong></p>
+    <ul>
+      <li>Aptitude: 25 MCQs</li>
+      <li>Python (Technical): 25 MCQs</li>
+      <li>Difficulty: Easy to Moderate</li>
+      <li>Only 35 out of 350 candidates were shortlisted — I was one of them.</li>
+    </ul>
+
+    <p><strong>✅ Round 2: Technical Interview</strong></p>
+    <ul>
+      <li>Panel: 2 Interviewers</li>
+      <li>Topics: Python, SQL, Machine Learning</li>
+      <li>Focused on real-world applications and problem-solving</li>
+      <li>Difficulty: Moderate</li>
+      <li>Duration: ~30 minutes with positive feedback</li>
+    </ul>
+
+    <p><strong>✅ Round 3: Managerial Round</strong></p>
+    <ul>
+      <li>Conducted by a senior manager</li>
+      <li>Evaluated my interest in technology and preferred domains</li>
+      <li>I discussed Python, ML, and AI as my areas of interest</li>
+      <li>Included some domain-specific questions</li>
+      <li>Difficulty: Easy to Moderate</li>
+    </ul>
+
+    <p><strong>✅ Round 4: HR Round</strong></p>
+    <ul>
+      <li>Self-introduction and family background</li>
+      <li>Willingness to relocate and work across domains</li>
+      <li>Situational and behavioral questions</li>
+      <li>Friendly and conversational round</li>
+    </ul>
+
+    <p><strong>🎉 Final Result:</strong><br/>
+      After 4–5 days, I received an official confirmation that I was selected by DataEconomy!
+    </p>
+
+    <p>This experience was shared by <strong>Sumit Dhavale</strong>, a friend of Rohan Sakhare.</p>
+
+    
+  </div>`,
+  "suraj": `<header>
+    <h1>Suraj Fartale</h1>
+    <p>Interview Experience @ Goldman Sachs</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>Goldman Sachs - Analyst Role</h2>
+
+    <p><strong>Round 1: Online Assessment</strong><br/>
+    Total: 7 sections, 70 questions<br/>
+    Marking: +5 for correct, -2 for wrong<br/>
+    Sections included:
+    <ul>
+      <li>Abstract Reasoning – Pattern recognition in shapes</li>
+      <li>Verbal Ability – Grammar, vocabulary, comprehension</li>
+      <li>Numerical Reasoning – Word problems, percentages, ratios</li>
+      <li>Logical Reasoning – Puzzles, sequences, arrangements</li>
+      <li>Numerical Calculations – Fast arithmetic</li>
+      <li>Data Interpretation – Graphs, charts, tables</li>
+      <li>Diagrammatic Reasoning – Flowcharts, logical diagrams</li>
+    </ul>
+    </p>
+
+    <p><strong>Round 2: Online Assessment</strong><br/>
+    <strong>1. Coding Section:</strong> 3 DSA questions (Medium to Hard). No negative marking. Topics included:
+    <ul>
+      <li>Arrays</li>
+      <li>Trees</li>
+      <li>Graphs</li>
+      <li>Dynamic Programming</li>
+    </ul>
+
+    <strong>2. HR-Based Essay:</strong> Topics like:
+    <em>“What will you do if one of your teammates cannot complete their work? How will you handle work pressure and meet deadlines?”</em>
+
+    <strong>3. Advanced MCQs:</strong> 10 Questions<br/>
+    Marking: +5 for correct, -2 for wrong<br/>
+    Topics: OS, DBMS, CN, and other advanced CS concepts
+    </p>
+
+    <p><strong>Round 3: Online Technical Interview</strong><br/>
+    <ul>
+      <li>Self-introduction</li>
+      <li>Project and internship discussion</li>
+      <li>Live coding: Check if two strings are anagrams + optimization</li>
+      <li>Technical questions: Stack, Queue, DBMS</li>
+    </ul>
+    </p>
+
+    <p><strong>Round 4: Online Coding Interview</strong><br/>
+    <strong>Question:</strong><br/>
+    Given a list of strings and a string of keywords (space-separated), print all strings that contain any of the keywords.<br/>
+    <strong>Example:</strong>
+    <pre>
+strings = [
+  "The weather is sunny today",
+  "I love playing football",
+  "Python is a powerful language",
+  "Let's go for a run"
+]
+keywords = "python football run"
+    </pre>
+    <strong>Output:</strong>
+    <pre>
+I love playing football
+Python is a powerful language
+Let's go for a run
+    </pre>
+    </p>
+
+    <p><strong>Round 5: Technical + Managerial Interview</strong><br/>
+    <ul>
+      <li>Introduction and detailed project discussion</li>
+      <li>Internship experience</li>
+      <li>Real-world logic-based scenarios</li>
+      <li>Behavioral questions like:
+        <em>“What will you do if your teammate gets all the credit for your efforts?”</em>
+      </li>
+    </ul>
+    Focus was on attitude, teamwork, and conflict handling.</p>
+
+    <p><strong>Result:</strong> Selected at Goldman Sachs</p>
+
+    <p>This experience was shared by <strong>Suraj Fartale</strong> from the Information Technology department.</p>
+
+    
+  </div>`,
+  "swati": `<header>
+    <h1>Swati Rangate</h1>
+    <p>Interview Experience @ Euronet</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>Euronet - Software Developer</h2>
+
+    <p><strong>Background:</strong><br/>
+      Swati Rangate was previously an intern at <strong>TraceLink</strong>. Her strong foundation in Java and hands-on project experience helped her perform well in the technical rounds.
+    </p>
+
+    <p><strong>Technical Interview Experience</strong></p>
+
+    <p><strong>Self-Introduction & Project Discussion:</strong></p>
+    <ul>
+      <li>Introduced herself and gave a detailed walkthrough of her district-level award-winning project.</li>
+      <li>Discussed the database design including the type of database used (SQL), number of tables, normalization strategies, constraints, and how the database was managed throughout the project lifecycle.</li>
+      <li>Explained her role, the implementation process, challenges faced, and the future scope of the project.</li>
+    </ul>
+
+    <p><strong>Core Subjects Covered:</strong></p>
+    <ul>
+      <li><strong>DBMS:</strong> Handled queries from basic to medium complexity, including JOINs, normalization techniques, constraints, and ACID properties.</li>
+      <li><strong>OOP Concepts:</strong> Explained Inheritance, Polymorphism, Encapsulation, and Abstraction with relevant Java examples.</li>
+      <li><strong>Java-Specific Questions:</strong> Covered Java syntax, multithreading, advantages, and limitations of the language.</li>
+    </ul>
+
+    <p><strong>Data Structures & Algorithms (DSA):</strong></p>
+    <ul>
+      <li>Solved pattern-based problems and string manipulation tasks like reversing each word in a sentence.</li>
+      <li>Performed array-based operations including searching and sorting algorithms.</li>
+    </ul>
+
+    <p><strong>Scenario-Based Question:</strong></p>
+    <ul>
+      <li>Asked how to optimize a system handling a large number of real-time transactions.</li>
+      <li>Discussion involved algorithm efficiency, database indexing strategies, and use of multithreading in Java.</li>
+    </ul>
+
+    <p><strong>Result:</strong> Selected at Euronet</p>
+
+    <p>This experience was shared by <strong>Swati Rangate</strong>, a friend of Rohan Sakhare.</p>
+
+    
+  </div>`,
+  "swiggy": `<header>
+    <h1>🟠 My Interview Experience with Swiggy – iOS Developer Intern 📱🚀</h1>
+    <p>Off-Campus | Final Year Computer Engineering Student | iOS Developer Intern</p>
+  </header>
+
+  <main style="padding: 2rem; line-height: 1.7;">
+    <p>I recently had the opportunity to interview with <strong>Swiggy</strong> for an iOS Developer Intern position, and I wanted to share my experience — hoping it helps others who are preparing for similar roles.</p>
+
+    <h2>✅ Round 1: Coding Round</h2>
+    <p>The process started with a coding round focused on problem-solving using basic data structures and algorithms. After successfully clearing this, I was shortlisted for the next stage.</p>
+
+    <h2>💻 Round 2: Technical Interview (R1)</h2>
+    <p>This round was centered around iOS development topics. The interviewer asked me questions based on <strong>Swift</strong> and <strong>SwiftUI</strong>, including:</p>
+    <ul>
+      <li>Swift language fundamentals</li>
+      <li>Views and layout in SwiftUI</li>
+      <li>Navigation and State management</li>
+      <li>MVVM architecture</li>
+    </ul>
+    <p>✅ I confidently answered around <strong>90%</strong> of the questions!</p>
+
+    <h2>📊 Round 3: DSA-focused Interview</h2>
+    <p>This round involved:</p>
+    <ul>
+      <li>Basic DSA questions</li>
+      <li>Medium-level coding problems</li>
+      <li>Dynamic Programming (DP) challenges</li>
+    </ul>
+    <p>🧠 I handled the easy and medium problems well, but found about <strong>70%</strong> of the DP questions difficult to understand.</p>
+
+    <h2>🔍 Key Takeaway</h2>
+    <p>Even for an <strong>internship role</strong>, companies like Swiggy expect a solid understanding of <strong>DSA</strong> along with strong <strong>platform-specific knowledge</strong> such as iOS development.</p>
+
+    <p>📚 This experience reminded me to continue improving my skills in both:</p>
+    <ul>
+      <li>✅ Swift & SwiftUI</li>
+      <li>✅ Data Structures & Algorithms</li>
+    </ul>
+
+    <p>To all fellow iOS developers and students: <strong>Keep practicing both development and problem-solving. Both are crucial in cracking interviews at top tech companies!</strong> 💪</p>
+  </main>`,
+  "tanishka": `<header>
+    <h1>Tanishka Dhole</h1>
+    <p>Interview Experience @ TraceLink (Internship + PPO)</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>🚀 Selected at TraceLink</h2>
+
+    <p><strong>Profile:</strong> Internship + Pre-Placement Offer (PPO)</p>
+
+    <p><strong>Selection Process:</strong> There were 3 elimination rounds:</p>
+
+    <ol>
+      <li><strong>Technical Interview (Round 1):</strong><br/>
+        - Questions based on resume and projects (tools used, role played)<br/>
+        - Basic DSA questions such as Binary Search<br/>
+        - Few scenario-based logical questions
+      </li>
+
+      <li><strong>Technical + Behavioral Interview (Round 2):</strong><br/>
+        - Follow-up questions on projects<br/>
+        - Sorting logic: Bubble Sort<br/>
+        - Introduction and hobbies
+      </li>
+
+      <li><strong>HR Interview (Round 3):</strong><br/>
+        - General discussion about resume<br/>
+        - Future career plans, family background, and behavioral fit
+      </li>
+    </ol>
+
+    <p><strong>✅ Verdict:</strong> <span style="color:lightgreen;"><strong>Selected</strong></span></p>
+
+    <p>This experience was shared by <strong>Tanishka Dhole</strong>, a friend of Rohan Sakhare.</p>
+
+    
+  </div>`,
+  "tejal": `<header>
+    <h1>Tejal Thombre</h1>
+    <p>Interview Experience @ LTI Mindtree</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>LTI Mindtree - Software Role</h2>
+
+    <p><strong>Round 1: Online Assessment</strong><br/>
+    This assessment consisted of four sections:
+    <ul>
+      <li><strong>Logical Ability:</strong> 20 minutes</li>
+      <li><strong>Quantitative Ability:</strong> 20 minutes</li>
+      <li><strong>Technical & Computer Programming:</strong> 35 minutes</li>
+      <li><strong>Communication Skills:</strong> 20 minutes</li>
+    </ul>
+    <em>Level: Easy to Moderate</em>
+    </p>
+
+    <p><strong>Round 2: Technical Interview</strong><br/>
+    Focused primarily on DBMS concepts and projects.
+    <ul>
+      <li>DBMS questions on Joins, Types of Keys</li>
+      <li>One SQL query writing task</li>
+      <li>Project-based cross-questions: Why specific functions/techniques were used?</li>
+    </ul>
+    <em>Level: Moderate (Good core knowledge is enough)</em>
+    </p>
+
+    <p><strong>Round 3: HR Interview</strong><br/>
+    Mainly focused on communication and personality-based questions:
+    <ul>
+      <li>Brief self-introduction</li>
+      <li>Why engineering?</li>
+      <li>Willingness to work in shifts?</li>
+      <li>Willing to relocate?</li>
+      <li>Handling two projects with the same deadline?</li>
+      <li>Any active backlogs?</li>
+      <li>Explain your project</li>
+    </ul>
+    <em>Level: Easy to Moderate</em>
+    </p>
+
+    <p><strong>Result:</strong> Selected at LTI Mindtree</p>
+
+    <p>This experience was shared by <strong>Tejal Thombre</strong>.</p>
+
+    
+  </div>`,
+  "tushar": `<header>
+    <h1>Tushar Gosavi</h1>
+    <p>Interview Experience @ Cognizant</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>Cognizant - Interview Process</h2>
+
+    <p><strong>Round 1 - Communication Assessment:</strong></p>
+    <ul>
+      <li>30-40 questions across 7 sections</li>
+      <li>Topics included basic grammar, paragraph-based questions, spotting errors, and correcting sentences</li>
+      <li>1-minute spoken opinion on a given topic</li>
+    </ul>
+
+    <p><strong>Round 2 - Aptitude Test:</strong></p>
+    <ul>
+      <li>Questions on percentage, ratio & proportion, profit & loss</li>
+      <li>Game-based aptitude and analytical reasoning</li>
+      <li><strong>Note:</strong> Strong aptitude skills are important to clear this round</li>
+    </ul>
+
+    <p><strong>Selection Criteria:</strong><br/>
+    Shortlisting for the next round was based on combined results of Round 1 and 2.</p>
+
+    <p><strong>Round 3 - Technical Assessment:</strong></p>
+    <ul>
+      <li><strong>SQL:</strong> 2 questions focused on Joins and related concepts</li>
+      <li><strong>Java:</strong> 2 questions including one on Collections</li>
+      <li><strong>HTML/CSS/JS:</strong> Code was partially given, task was to complete it – for example, show profile image and name on click</li>
+    </ul>
+
+    <p><strong>Round 4 - Interview:</strong></p>
+    <ul>
+      <li>Conducted on-campus, students joined virtually from their laptops</li>
+      <li>Topics covered: Self-introduction, resume and project-based questions, certificate discussion</li>
+      <li><strong>Technical Questions:</strong> OOPs with real-life examples, DBMS concepts, SQL vs NoSQL, Java coding (patterns, toggle string, bubble sort, selection sort)</li>
+    </ul>
+
+    <p style="color: #00ff88;"><strong>🎉 Result: Selected</strong></p>
+
+    <p>This experience was shared by <strong>Tushar Gosavi</strong>, a friend of Rohan Sakhare.</p>
+
+    
+  </div>`,
+  "vaibhavi": `<header>
+    <h1>Vaibhavi Dixit</h1>
+    <p>Interview Experience @ Visteon</p>
+  </header>
+
+  <div class="experience-container">
+    <h2>Visteon - Interview Experience</h2>
+
+    <h3>Round 1: Online Assessment</h3>
+    <ul>
+      <li>Standard aptitude and logical reasoning test</li>
+    </ul>
+
+    <h3>Round 2: DSA Pen and Paper Round</h3>
+    <ul>
+      <li>Data Structures and Algorithms questions to be solved with pen and paper</li>
+    </ul>
+
+    <h3>Round 3: Technical Interview</h3>
+    <ul>
+      <li>Topics Covered: Projects, Machine Learning concepts, Code questions</li>
+      <li>Logical puzzles and problem-solving</li>
+      <li>OS, Python, C/C++, Classes vs Structs</li>
+      <li>ML Concepts: Decision Trees, Random Forests</li>
+      <li>Bitwise operations and algorithm efficiency</li>
+    </ul>
+
+    <h3>Round 4: Managerial Interview</h3>
+    <ul>
+      <li>Team management and leadership scenarios</li>
+      <li>Questions about studying abroad and career goals</li>
+      <li>Personal motivations: Why engineering?</li>
+      <li>Discussion on daily routine and approach to learning</li>
+      <li>Talked about Indian culture, company vision, and personal aims</li>
+    </ul>
+
+    <h3>Round 5: HR + Technical Interview</h3>
+    <ul>
+      <li>Self-introduction and motivation</li>
+      <li>Reason for choosing Visteon</li>
+      <li>Location preferences</li>
+      <li>Approach to work and learning at the company</li>
+    </ul>
+
+    <p><strong>Final Result:</strong> ✅ <strong>Selected</strong> — Congratulations to <strong>Vaibhavi Dixit</strong>!</p>
+
+    
+  </div>`,
+  "vistex": `<header>
+    <h1>🚀 My Interview Experience at Vistex – Campus Placement</h1>
+    <p>📍 In-Person Interview at Mumbai | College Campus Drive</p>
+  </header>
+
+  <main style="padding: 2rem; line-height: 1.7;">
+    <p><strong>Vistex</strong> visited our college for a campus recruitment drive. The process was structured with an initial <strong>MCQ-based assessment</strong>, followed by two rounds of technical interviews held at the <strong>Vistex office in Andheri West, Mumbai</strong>.</p>
+
+    <h2>📝 Round 1: Online Assessment</h2>
+    <p>The first step was a multiple-choice question (MCQ) assessment focusing on technical fundamentals. I successfully cleared this round and was shortlisted for the interview.</p>
+
+    <h2>💻 Round 2: Technical Interview – Round 1</h2>
+    <p>This round included fundamental programming and technical questions such as:</p>
+    <ul>
+      <li>✅ HTML basics</li>
+      <li>✅ MySQL queries</li>
+      <li>✅ String reversal</li>
+      <li>✅ Array reversal and addition</li>
+      <li>✅ Linear search and binary search algorithms</li>
+    </ul>
+    <p>I was able to confidently solve all these and cleared the first technical round.</p>
+
+    <h2>💻 Round 3: Technical Interview – Round 2</h2>
+    <p>After clearing the first round, only a few candidates were shortlisted — I was one of them. The second round involved deeper computer science fundamentals:</p>
+    <ul>
+      <li>🔹 Concepts of <strong>trees</strong> and <strong>graphs</strong> (theory-based problem-solving)</li>
+      <li>🔹 Binary Search Trees (BST): how they work and operations</li>
+      <li>🔹 Questions on <strong>multithreading</strong></li>
+      <li>🔹 A moderate-level SQL query</li>
+    </ul>
+    <p>I answered most of the questions well, and the interview went smoothly.</p>
+
+    <h2>📌 Final Status</h2>
+    <p>Unfortunately, I was not selected in the final list. The company followed a policy of selecting <strong>only one candidate per college</strong>. A friend of mine from the same college was selected.</p>
+
+    <h2>💡 Takeaway</h2>
+    <p>Even though I wasn’t selected, I felt confident and satisfied with my performance in both technical rounds. This experience sharpened my understanding of core topics like arrays, SQL, and data structures like trees and graphs.</p>
+
+    <p><strong>Advice:</strong> For companies like Vistex, focus on writing clean logic for basic problems and also be thorough with theoretical concepts of data structures and SQL.</p>
+  </main>`,
+  "xalta": `<header>
+    <h1>🚀 My Interview Experience at Xalta – iOS/Software Intern Role</h1>
+    <p>Campus Referral | Computer Engineering Department | Final Year</p>
+  </header>
+
+  <main style="padding: 2rem; line-height: 1.7;">
+    <p>The opportunity with <strong>Xalta</strong> came through my college’s <strong>Training and Placement Department</strong>, which forwarded my resume directly to the company’s HR team along with a few other students from our Computer Department.</p>
+
+    <h2>🧩 Interview Experience</h2>
+    <p>I was shortlisted for the direct interview round. Here's how it went:</p>
+
+    <h3>1️⃣ Object-Oriented Programming (OOP)</h3>
+    <p>The interviewer started with simple OOP questions, focusing on core concepts. I was also asked to:</p>
+    <ul>
+      <li>✅ Create a class</li>
+      <li>✅ Perform basic operations on objects</li>
+      <li>✅ Explain concepts like encapsulation, inheritance, and polymorphism</li>
+    </ul>
+
+    <h3>2️⃣ MySQL</h3>
+    <p>The next set of questions involved SQL queries and theoretical database concepts. Topics included:</p>
+    <ul>
+      <li>🔍 What is a <strong>cursor</strong> in SQL?</li>
+      <li>🔍 What is an <strong>index</strong> and how does it help?</li>
+      <li>🧠 Writing basic SQL queries</li>
+    </ul>
+
+    <h3>3️⃣ Array Logic Problem</h3>
+    <p>Then I was given an interesting array question:</p>
+    <blockquote>
+      Given an array that stores only <code>1</code> and <code>-1</code>, arrange or maintain it in such a way that the sum of all elements becomes <strong>0</strong>.
+    </blockquote>
+    <p>I attempted this problem using logic-based reasoning to balance the count of 1’s and -1’s.</p>
+
+    <h3>4️⃣ Python Questions</h3>
+    <p>In the final part of the interview, the interviewer asked me a few Python-related questions. However, since I am not proficient in Python, I couldn’t answer them effectively.</p>
+
+    <h2>🚫 Outcome</h2>
+    <p>Although I did well in OOP, MySQL, and logic problems, my lack of experience in Python affected my performance in the final section.</p>
+
+    <h2>💡 Takeaway</h2>
+    <p>This interview taught me the importance of language flexibility and being prepared for multi-language questions in interviews. I plan to explore Python basics moving forward, while continuing to strengthen my OOP and problem-solving skills.</p>
+
+    <p><strong>Tip for juniors:</strong> Focus not only on your preferred language but also be open to other common industry languages like Python and Java. It can increase your chances in technical interviews!</p>
+  </main>`
+};
+
+// ── OPEN / CLOSE EXPERIENCE ──
+function openExp(key) {
+  const content = EXPERIENCES[key];
+  if (!content) return;
+  document.getElementById('exp-content').innerHTML = content;
+  const overlay = document.getElementById('exp-overlay');
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  overlay.scrollTop = 0;
+  document.getElementById('exp-panel').scrollTop = 0;
+}
+
+function closeExp() {
+  document.getElementById('exp-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Close on overlay click (outside panel)
+document.getElementById('exp-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeExp();
+});
+
+// Close on Escape
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeExp(); });
+
+// ── CURSOR ──
+const cursor = document.getElementById('cursor');
+const trail = document.getElementById('cursor-trail');
+let mx = 0, my = 0, tx = 0, ty = 0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+});
+(function animTrail() {
+  tx += (mx - tx) * 0.12; ty += (my - ty) * 0.12;
+  trail.style.left = tx + 'px'; trail.style.top = ty + 'px';
+  requestAnimationFrame(animTrail);
+})();
+document.querySelectorAll('a,button,.company-card,.friend-card,.topic-card').forEach(el => {
+  el.addEventListener('mouseenter', () => { cursor.style.transform = 'translate(-50%,-50%) scale(2)'; cursor.style.background = 'var(--accent-purple)'; trail.style.borderColor = 'rgba(140,100,255,.5)'; });
+  el.addEventListener('mouseleave', () => { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; cursor.style.background = 'var(--accent-cyan)'; trail.style.borderColor = 'rgba(0,220,255,.3)'; });
+});
+
+// ── PARTICLES ──
+const pc = document.getElementById('particles');
+const pcols = ['rgba(0,220,255,.6)','rgba(140,100,255,.5)','rgba(255,80,200,.4)'];
+function mkParticle() {
+  const p = document.createElement('div'); p.className = 'particle';
+  p.style.cssText = `left:${Math.random()*100}vw;animation-duration:${9+Math.random()*11}s;animation-delay:${Math.random()*12}s;background:${pcols[Math.floor(Math.random()*3)]};width:${1+Math.random()*2}px;height:${1+Math.random()*2}px`;
+  pc.appendChild(p); setTimeout(() => p.remove(), 24000);
+}
+for(let i=0;i<28;i++) mkParticle();
+setInterval(mkParticle, 650);
+
+// ── TYPED TEXT ──
+const phrases = ['Building the future, one interview at a time.','20+ companies · Real experiences · Honest reviews.','DIT 2025 · Computer Engineer · Dream chaser.','Helping you crack your next big interview. 🚀'];
+let pi=0,ci=0,del=false;
+const tel = document.getElementById('typed-text');
+function typeLoop() {
+  const ph = phrases[pi];
+  if (!del) { tel.textContent = ph.substring(0,++ci); if(ci===ph.length){del=true;setTimeout(typeLoop,2200);return;} setTimeout(typeLoop,45); }
+  else { tel.textContent = ph.substring(0,--ci); if(ci===0){del=false;pi=(pi+1)%phrases.length;setTimeout(typeLoop,400);return;} setTimeout(typeLoop,22); }
+}
+setTimeout(typeLoop, 1500);
+
+// ── COUNTERS ──
+const cobs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) { animCount(e.target,+e.target.dataset.count); cobs.unobserve(e.target); } });
+}, {threshold:.5});
+document.querySelectorAll('.stat-num').forEach(el => cobs.observe(el));
+function animCount(el, target) {
+  let n=0; const step=()=>{ n+=Math.ceil((target-n)/8); el.textContent=n>=target?target+'+':n; if(n<target) requestAnimationFrame(step); }; requestAnimationFrame(step);
+}
+
+// ── REVEAL ──
+const robs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),80);robs.unobserve(e.target);} });
+}, {threshold:.08});
+document.querySelectorAll('.reveal').forEach(el => robs.observe(el));
+
+// ── SCROLL TRACK ──
+function scrollTrack(id, dir) { document.getElementById(id).scrollBy({left:dir*480,behavior:'smooth'}); }
+
+// ── NAV ACTIVE ──
+const navLinks = document.querySelectorAll('nav a');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  document.querySelectorAll('section[id]').forEach(s => { if(window.scrollY >= s.offsetTop - 220) cur = s.id; });
+  navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+});
+
+// ── STARFIELD CANVAS ──
+const canvas = document.createElement('canvas');
+canvas.id = 'bg-canvas'; document.body.prepend(canvas);
+const ctx = canvas.getContext('2d');
+let stars = [];
+function rsz() { canvas.width=innerWidth; canvas.height=innerHeight; }
+rsz(); window.addEventListener('resize', rsz);
+for(let i=0;i<100;i++) stars.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.1,o:Math.random()*.45+.08});
+(function drawStars(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s=>{
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(170,215,255,${s.o})`; ctx.fill();
+    s.o+=(Math.random()-.5)*.018; s.o=Math.max(.05,Math.min(.55,s.o));
+  });
+  requestAnimationFrame(drawStars);
+})();
+</script>
 </body>
 </html>
